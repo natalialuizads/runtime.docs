@@ -1,129 +1,245 @@
-"use client"
+"use client";
 
-import { CodeBlock } from "@/components/code-block"
-import { ComparisonTable } from "@/components/comparison-table"
-import { DynamicDiagram } from "@/components/dynamic-diagram"
-import { EventLoopSimulator } from "@/components/interactive/event-loop-simulator"
-import { Activity, Clock, Code2, Cpu, Layers, Layout } from "lucide-react"
+import { CodeBlock } from "@/components/code-block";
+import { ComparisonTable } from "@/components/comparison-table";
+import { DynamicDiagram } from "@/components/dynamic-diagram";
+import { EventLoopSimulator } from "@/components/interactive/event-loop-simulator";
+import { Activity, Clock, Code2, Cpu, Layers, Layout } from "lucide-react";
 
 export function EventLoopSection() {
   return (
     <section className="mx-auto max-w-4xl px-4 py-16">
       <div className="mb-8">
         <div className="mb-2 font-mono text-sm text-primary">FASE 1.1</div>
-        <h2 className="mb-4 text-3xl font-bold text-foreground">Single Thread & Event Loop</h2>
+        <h2 className="mb-4 text-3xl font-bold text-foreground">
+          Single Thread & Event Loop
+        </h2>
         <p className="text-lg text-muted-foreground">
-          Como o Browser gerencia o "Main Thread" - e por que isso importa mais do que voce pensa.
+          Como o Browser gerencia o "Main Thread" - e por que isso importa mais
+          do que você pensa.
         </p>
       </div>
 
+      {/* Conceito Fundamental */}
       <div className="prose prose-invert max-w-none">
         <p className="text-muted-foreground">
-          No backend, voce esta acostumado com <strong className="text-foreground">multi-threading</strong>. 
-          Um servidor Node.js usa o Event Loop, mas operacoes pesadas podem ser delegadas para Worker Threads. 
-          Um servidor Java spawna threads por request.
+          JavaScript é fundamentalmente{" "}
+          <strong className="text-foreground">single-threaded</strong>. Não
+          importa onde execute - no Browser ou no servidor - tudo acontece em
+          uma única thread. Não há paralelismo real, sem múltiplas threads
+          executando código simultaneamente.
         </p>
-        
-        <p className="text-foreground font-medium">No Browser, voce nao tem esse luxo.</p>
+
       </div>
 
-      <DynamicDiagram 
-        title="Arquitetura do Main Thread"
-        nodes={[
-          { id: 'js', label: 'JS Execution', icon: Code2, x: 20, y: 40, color: 'border-yellow-500/50' },
-          { id: 'dom', label: 'DOM/CSSOM', icon: Layers, x: 50, y: 40, color: 'border-blue-500/50' },
-          { id: 'paint', label: 'Layout & Paint', icon: Layout, x: 80, y: 40, color: 'border-green-500/50' },
-          { id: 'cpu', label: 'Single CPU Core', icon: Cpu, x: 50, y: 80, color: 'border-primary' },
-        ]}
-        edges={[
-          { from: 'js', to: 'cpu', animated: true },
-          { from: 'dom', to: 'cpu', animated: true },
-          { from: 'paint', to: 'cpu', animated: true },
-        ]}
-      />
-
-      <div className="my-8 rounded-lg border border-chart-4/30 bg-chart-4/10 p-4">
-        <h3 className="mb-3 font-mono text-sm font-semibold text-chart-4">
-          A Analogia do Servidor Single-Threaded
+      {/* Analogia do Atendente (Introdução) */}
+      <div className="my-8 rounded-lg border border-chart-4/30 bg-chart-4/10 p-6">
+        <h3 className="mb-4 font-mono text-sm font-semibold text-chart-4">
+          Analogia: O atendente único
         </h3>
         <p className="mb-4 text-sm text-chart-4/80">
-          Imagine um servidor HTTP que processa requests em uma unica thread:
+          Pense no JavaScript como um atendente que processa clientes em fila,
+          um de cada vez:
+        </p>
+        <ul className="space-y-2 text-sm text-chart-4/80">
+          <li className="flex items-start gap-2">
+            <span className="text-chart-4">•</span>
+            <span>
+              <strong>Cliente 1 chega:</strong> Atendente começa a processar
+            </span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-chart-4">•</span>
+            <span>
+              <strong>Cliente 2 chega:</strong> Espera na fila
+            </span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-chart-4">•</span>
+            <span>
+              <strong>Cliente 1 demora 50 minutos:</strong> Clientes 2, 3 e 4
+              ficam esperando
+            </span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-chart-4">•</span>
+            <span>
+              <strong>Resultado:</strong> Experiência ruim para todos
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      {/* Arquitetura */}
+      <div className="my-8">
+        <h3 className="mb-4 font-semibold text-foreground">
+          Arquitetura do Main Thread
+        </h3>
+        <DynamicDiagram
+          title="Como funciona internamente"
+          nodes={[
+            {
+              id: "js",
+              label: "JS Execution",
+              icon: Code2,
+              x: 20,
+              y: 20,
+              color: "border-yellow-500/50",
+            },
+            {
+              id: "dom",
+              label: "DOM/CSSOM",
+              icon: Layers,
+              x: 50,
+              y: 10,
+              color: "border-blue-500/50",
+            },
+            {
+              id: "paint",
+              label: "Layout & Paint",
+              icon: Layout,
+              x: 80,
+              y: 20,
+              color: "border-green-500/50",
+            },
+            {
+              id: "cpu",
+              label: "Single CPU Core",
+              icon: Cpu,
+              x: 50,
+              y: 60,
+              color: "border-primary",
+            },
+          ]}
+          edges={[
+            { from: "js", to: "cpu" },
+            { from: "dom", to: "cpu" },
+            { from: "paint", to: "cpu" },
+          ]}
+        />
+      </div>
+
+      {/* Event Loop Visual */}
+      <div className="my-8">
+        <h3 className="mb-4 font-semibold text-foreground">
+          O Event Loop em ação
+        </h3>
+        <DynamicDiagram
+          title="Fila de Eventos (Event Queue)"
+          nodes={[
+            { id: "q", label: "Event Queue", icon: Clock, x: 20, y: 50 },
+            {
+              id: "worker",
+              label: "JavaScript Thread",
+              icon: Activity,
+              x: 60,
+              y: 50,
+              color: "border-destructive",
+            },
+            { id: "r1", label: "Click Event", x: 85, y: 20 },
+            {
+              id: "r2",
+              label: "Heavy Computation",
+              x: 85,
+              y: 50,
+              color: "border-destructive",
+            },
+            { id: "r3", label: "Scroll Event (ESPERANDO)", x: 85, y: 80 },
+          ]}
+          edges={[
+            { from: "q", to: "worker", animated: true, label: "Processando" },
+            { from: "worker", to: "r1", label: "✓ Concluído" },
+            { from: "worker", to: "r2", animated: true, label: "🔴 BLOQUEADO" },
+            { from: "worker", to: "r3", label: "⏳ Aguardando" },
+          ]}
+        />
+
+        <p className="my-6 text-muted-foreground">
+          Enquanto o JavaScript processa um{" "}
+          <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-sm text-foreground">
+            Heavy Computation
+          </code>
+          ,{" "}
+          <strong className="text-foreground">
+            nenhum outro evento é processado
+          </strong>
+          . Cliques, scroll, animações - tudo fica na fila esperando seu
+          momento.
         </p>
       </div>
 
-      <DynamicDiagram 
-        title="Request Queue Blocking"
-        nodes={[
-          { id: 'q', label: 'Request Queue', icon: Clock, x: 20, y: 50 },
-          { id: 'worker', label: 'Single Worker', icon: Activity, x: 60, y: 50, color: 'border-destructive' },
-          { id: 'r1', label: 'GET /health', x: 85, y: 20 },
-          { id: 'r2', label: 'POST /compute', x: 85, y: 50, color: 'border-destructive' },
-          { id: 'r3', label: 'GET /health (WAIT)', x: 85, y: 80 },
-        ]}
-        edges={[
-          { from: 'q', to: 'worker', animated: true, label: 'Incoming' },
-          { from: 'worker', to: 'r1', label: 'Done' },
-          { from: 'worker', to: 'r2', animated: true, label: 'BLOCKING' },
-          { from: 'worker', to: 'r3', label: 'Locked' },
-        ]}
-      />
-
-      <p className="my-6 text-muted-foreground">
-        Enquanto <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-sm text-foreground">POST /compute</code> executa, 
-        <strong className="text-foreground"> nenhum health check responde</strong>. 
-        O Load Balancer marca o servidor como "down".
-      </p>
-
-      <ComparisonTable
-        headers={["Backend (Servidor)", "Frontend (Browser)"]}
-        rows={[
-          ["POST /compute pesado", "for loop de 1 milhao de iteracoes"],
-          ["Health check nao responde", "Clique do usuario nao responde"],
-          ["Servidor parece \"morto\"", "UI parece \"travada\""],
-          ["Timeout do Load Balancer", "Usuario fecha a aba"],
-        ]}
-      />
-
+      {/* Frame Budget */}
       <div className="my-8 rounded-lg border border-primary/30 bg-primary/10 p-6">
-        <h3 className="mb-4 font-mono text-lg font-semibold text-primary">O Frame Budget</h3>
+        <h3 className="mb-4 font-mono text-lg font-semibold text-primary">
+          O Frame Budget
+        </h3>
         <p className="mb-4 text-sm text-foreground">
-          O Browser precisa renderizar a <strong>60 FPS</strong> para parecer fluido. Isso significa:
+          O Browser precisa renderizar a <strong>60 FPS</strong> (quadros por
+          segundo) para parecer fluido. Isso significa:
         </p>
         <div className="rounded bg-background/50 p-4 text-center">
           <code className="font-mono text-lg text-primary">
-            Budget por Frame = 1000ms / 60 ≈ 16.67ms
+            Tempo por Frame = 1000ms ÷ 60 = <strong>16.67ms</strong>
           </code>
         </div>
         <p className="mt-4 text-sm text-muted-foreground">
-          Se seu JavaScript executar por <strong className="text-destructive">50ms</strong>, 
-          voce perdeu <strong className="text-destructive">3 frames</strong>. 
-          O usuario percebe "jank" (travamento visual).
+          Se seu JavaScript executar por{" "}
+          <strong className="text-destructive">50ms</strong>, você perde{" "}
+          <strong className="text-destructive">3 frames</strong>. O usuário vê a
+          página "travar" momentaneamente.
         </p>
       </div>
 
-      <CodeBlock language="javascript" filename="frame-budget-violation.js">
-{`// Isso causa JANK
-button.addEventListener('click', () => {
-  // Processamento sincrono de 50ms
-  const result = processLargeDataset(data); // Bloqueia TUDO
-  updateUI(result);
-});
+      {/* Comparação: O que bloqueia */}
+      <div className="my-8">
+        <h3 className="mb-4 font-semibold text-foreground">
+          O que acontece durante um bloqueio?
+        </h3>
+        <ComparisonTable
+          headers={["Evento na Fila", "Status"]}
+          rows={[
+            ["1. Clique do usuário", "✓ Executa imediatamente"],
+            ["2. For loop pesado (50ms)", "🔴 Bloqueia TUDO"],
+            ["3. Scroll do usuário", "⏳ Fica esperando"],
+            ["4. Animação CSS", "⏸️ Pausada, travada"],
+            ["5. Próximo clique", "⏳ Ainda esperando"],
+          ]}
+        />
+      </div>
 
-// Durante esses 50ms:
-// - Animacoes CSS: PAUSADAS
-// - Scroll: TRAVADO  
-// - Outros cliques: IGNORADOS
-// - Usuario: FRUSTRADO`}
-      </CodeBlock>
-
-      <div className="my-12 border-t border-border pt-8">
-        <h3 className="mb-4 text-xl font-bold text-foreground">Experimente Voce Mesmo</h3>
+      {/* Simulador Interativo */}
+      <div className="my-12  pt-8">
+        <h3 className="mb-4 text-xl font-bold text-foreground">
+          Experimente você mesmo
+        </h3>
         <p className="mb-6 text-muted-foreground">
-          Compare o comportamento de codigo blocking vs chunked. Tente clicar no botao durante
-          a execucao de <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-sm">heavyComputation()</code>:
+          Veja ao vivo a diferença entre código que bloqueia vs código
+          otimizado. Tente clicar no botão e interagir durante a execução:
         </p>
         <EventLoopSimulator />
       </div>
+
+      {/* Resumo Final */}
+      <div className="my-8 rounded-lg border border-green-500/30 bg-green-500/10 p-6">
+        <h3 className="mb-3 font-mono text-sm font-semibold text-green-500">
+          Resumo Importante
+        </h3>
+        <ul className="space-y-2 text-sm text-green-500/80">
+          <li>
+            • JavaScript é <strong>sempre single-threaded</strong>
+          </li>
+          <li>
+            • Eventos são processados um por vez na <strong>Event Queue</strong>
+          </li>
+          <li>
+            • Operações longas <strong>bloqueiam tudo</strong>
+          </li>
+          <li>
+            • Você tem apenas <strong>16.67ms por frame</strong> para não travar
+          </li>
+          <li>• Usar Web Workers ou chunking resolve o problema</li>
+        </ul>
+      </div>
     </section>
-  )
+  );
 }

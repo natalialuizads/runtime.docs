@@ -1,45 +1,52 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { motion } from "framer-motion"
-import { LucideIcon } from "lucide-react"
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { LucideIcon } from "lucide-react";
 
 interface Node {
-  id: string
-  label: string
-  icon?: LucideIcon
-  color?: string
-  x: number
-  y: number
+  id: string;
+  label: string;
+  icon?: LucideIcon;
+  color?: string;
+  x: number;
+  y: number;
 }
 
 interface Edge {
-  from: string
-  to: string
-  label?: string
-  animated?: boolean
+  from: string;
+  to: string;
+  label?: string;
+  animated?: boolean;
 }
 
 interface DynamicDiagramProps {
-  nodes: Node[]
-  edges: Edge[]
-  title?: string
-  className?: string
+  nodes: Node[];
+  edges: Edge[];
+  title?: string;
+  className?: string;
 }
 
-export function DynamicDiagram({ nodes, edges, title, className }: DynamicDiagramProps) {
+export function DynamicDiagram({
+  nodes,
+  edges,
+  title,
+  className,
+}: DynamicDiagramProps) {
   return (
-    <div className={cn(
-      "my-8 overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all dark:bg-secondary/10", 
-      className
-    )}>
+    <div
+      className={cn(
+        "my-8 overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all dark:bg-secondary/10",
+        className,
+      )}
+    >
       {title && (
         <div className="mb-6 px-6 pt-6 font-mono text-sm font-semibold text-primary/80 tracking-tight">
           {title}
         </div>
       )}
-      
-      <div className="relative h-[300px] w-full p-6">
+
+      <div className="relative h-[400px] w-full p-6">
         <svg className="absolute inset-0 h-full w-full overflow-visible">
           <defs>
             <marker
@@ -50,16 +57,20 @@ export function DynamicDiagram({ nodes, edges, title, className }: DynamicDiagra
               refY="3"
               orient="auto"
             >
-              <polygon points="0 0, 8 3, 0 6" fill="currentColor" className="text-muted-foreground/60" />
+              <polygon
+                points="0 0, 8 3, 0 6"
+                fill="currentColor"
+                className="text-muted-foreground/60"
+              />
             </marker>
           </defs>
-          
+
           {edges.map((edge, i) => {
-            const fromNode = nodes.find(n => n.id === edge.from)
-            const toNode = nodes.find(n => n.id === edge.to)
-            
-            if (!fromNode || !toNode) return null
-            
+            const fromNode = nodes.find((n) => n.id === edge.from);
+            const toNode = nodes.find((n) => n.id === edge.to);
+
+            if (!fromNode || !toNode) return null;
+
             return (
               <g key={`edge-${i}`} className="group">
                 <motion.line
@@ -92,16 +103,16 @@ export function DynamicDiagram({ nodes, edges, title, className }: DynamicDiagra
                     transition={{ delay: 0.8 + i * 0.1 }}
                   >
                     <rect
-                      x={`${(fromNode.x + toNode.x) / 2 - 4}%`}
-                      y={`${(fromNode.y + toNode.y) / 2 - 3}%`}
+                      x={`${fromNode.x + toNode.x}%`}
+                      y={`${fromNode.y + toNode.y}%`}
                       width="8%"
                       height="16"
                       rx="4"
                       className="fill-background/80 blur-sm"
                     />
                     <text
-                      x={`${(fromNode.x + toNode.x) / 2}%`}
-                      y={`${(fromNode.y + toNode.y) / 2 - 1}%`}
+                      x={`${fromNode.x + toNode.x}%`}
+                      y={`${fromNode.y + toNode.y}%`}
                       className="fill-muted-foreground font-mono text-[10px] font-medium"
                       textAnchor="middle"
                     >
@@ -110,7 +121,7 @@ export function DynamicDiagram({ nodes, edges, title, className }: DynamicDiagra
                   </motion.g>
                 )}
               </g>
-            )
+            );
           })}
         </svg>
 
@@ -119,21 +130,28 @@ export function DynamicDiagram({ nodes, edges, title, className }: DynamicDiagra
             key={node.id}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", damping: 15, stiffness: 150, delay: i * 0.05 }}
+            transition={{
+              type: "spring",
+              damping: 15,
+              stiffness: 150,
+              delay: i * 0.05,
+            }}
             style={{
-              left: `${node.x}%`,
-              top: `${node.y}%`,
+              left: `${node.x - 8}%`,
+              top: `${node.y - 10}%`,
               transform: "translate(-50%, -50%)",
             }}
             className="absolute flex flex-col items-center gap-2"
           >
-            <div 
+            <div
               className={cn(
                 "flex h-14 w-14 items-center justify-center rounded-2xl border bg-card p-3 shadow-md transition-all hover:scale-110 hover:shadow-lg hover:border-primary/50",
-                node.color || "border-border"
+                node.color || "border-border",
               )}
             >
-              {node.icon && <node.icon className="h-7 w-7 text-foreground/80" />}
+              {node.icon && (
+                <node.icon className="h-7 w-7 text-foreground/80" />
+              )}
             </div>
             <span className="whitespace-nowrap px-2 py-0.5 rounded-md bg-background/50 backdrop-blur-sm font-mono text-xs font-bold text-foreground/90">
               {node.label}
@@ -142,5 +160,5 @@ export function DynamicDiagram({ nodes, edges, title, className }: DynamicDiagra
         ))}
       </div>
     </div>
-  )
+  );
 }
