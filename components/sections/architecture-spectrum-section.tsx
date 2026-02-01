@@ -1,11 +1,9 @@
 "use client"
 
-import React from "react"
-
-import { useState } from "react"
+import { DynamicDiagram } from "@/components/dynamic-diagram"
 import { cn } from "@/lib/utils"
-import { AsciiDiagram } from "@/components/ascii-diagram"
-import { Server, Globe, Smartphone, Zap, Database, Cloud, ArrowRight } from "lucide-react"
+import { Activity, Box, Cloud, Database, Globe, Layers, Server, Smartphone, Zap } from "lucide-react"
+import React, { useState } from "react"
 
 type ArchitectureType = "spa" | "ssr" | "webview" | "edge"
 
@@ -21,7 +19,10 @@ interface ArchitectureData {
   seo: number
   latency: number
   description: string
-  diagram: string
+  diagram: {
+    nodes: Array<{ id: string; label: string; icon?: any; x: number; y: number; color?: string }>
+    edges: Array<{ from: string; to: string; label?: string; animated?: boolean }>
+  }
   prosBackend: string[]
   consBackend: string[]
 }
@@ -39,17 +40,21 @@ const architectures: ArchitectureData[] = [
     seo: 25,
     latency: 70,
     description: "O servidor entrega apenas arquivos estaticos (HTML/JS/CSS). Toda a logica roda no cliente. E como uma API REST pura: stateless, escalavel horizontalmente via CDN.",
-    diagram: `┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Browser   │────▶│     CDN     │────▶│  Static     │
-│  (Runtime)  │     │ (Edge Cache)│     │  Files      │
-└─────────────┘     └─────────────┘     └─────────────┘
-       │                                        
-       │  API Calls (JSON)                      
-       ▼                                        
-┌─────────────┐     ┌─────────────┐              
-│  REST API   │────▶│  Database   │              
-│ (Stateless) │     │             │              
-└─────────────┘     └─────────────┘`,
+    diagram: {
+      nodes: [
+        { id: 'browser', label: 'Browser', icon: Smartphone, x: 20, y: 30 },
+        { id: 'cdn', label: 'CDN (Edge)', icon: Globe, x: 50, y: 30, color: 'border-primary' },
+        { id: 'files', label: 'Static Files', icon: Box, x: 80, y: 30 },
+        { id: 'api', label: 'REST API', icon: Server, x: 50, y: 70, color: 'border-chart-4' },
+        { id: 'db', label: 'Database', icon: Database, x: 80, y: 70 },
+      ],
+      edges: [
+        { from: 'browser', to: 'cdn', animated: true, label: 'Initial' },
+        { from: 'cdn', to: 'files', animated: true },
+        { from: 'browser', to: 'api', animated: true, label: 'JSON' },
+        { from: 'api', to: 'db', animated: true },
+      ]
+    },
     prosBackend: [
       "Servidor nao processa HTML (zero CPU para render)",
       "Cache agressivo na CDN (TTL infinito para assets)",
@@ -73,16 +78,18 @@ const architectures: ArchitectureData[] = [
     seo: 95,
     latency: 40,
     description: "O servidor renderiza HTML completo a cada request. E o modelo classico (PHP, JSP, Rails) mas com Node.js. Pense como um endpoint que retorna text/html ao inves de application/json.",
-    diagram: `┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Browser   │────▶│   Node.js   │────▶│  Database   │
-│  (Display)  │     │  (Render)   │     │             │
-└─────────────┘     └─────────────┘     └─────────────┘
-       ▲                   │                    
-       │     HTML String   │                    
-       └───────────────────┘                    
-                                               
-   Cada request = CPU no servidor (render)      
-   Cache: Varnish/CDN com stale-while-revalidate`,
+    diagram: {
+      nodes: [
+        { id: 'browser', label: 'Browser', icon: Smartphone, x: 20, y: 50 },
+        { id: 'node', label: 'Node.js (Render)', icon: Server, x: 60, y: 50, color: 'border-accent' },
+        { id: 'db', label: 'Database', icon: Database, x: 90, y: 50 },
+      ],
+      edges: [
+        { from: 'browser', to: 'node', animated: true, label: 'GET' },
+        { from: 'node', to: 'db', animated: true },
+        { from: 'node', to: 'browser', animated: true, label: 'HTML' },
+      ]
+    },
     prosBackend: [
       "SEO perfeito (HTML completo na resposta)",
       "First Paint rapido (HTML ja renderizado)",
@@ -106,19 +113,17 @@ const architectures: ArchitectureData[] = [
     seo: 0,
     latency: 50,
     description: "Um container isolado do browser rodando dentro do app nativo. E literalmente um 'Docker do Chrome' embedded. O app nativo e o host, a WebView e o container.",
-    diagram: `┌─────────────────────────────────────────────┐
-│              NATIVE APP (Host)              │
-│  ┌───────────────────────────────────────┐  │
-│  │           WEBVIEW (Container)         │  │
-│  │  ┌─────────────────────────────────┐  │  │
-│  │  │      Chromium Engine            │  │  │
-│  │  │  ┌───────────────────────────┐  │  │  │
-│  │  │  │    Sua Web App (SPA)      │  │  │  │
-│  │  │  └───────────────────────────┘  │  │  │
-│  │  └─────────────────────────────────┘  │  │
-│  └───────────────────────────────────────┘  │
-│     Bridge: postMessage / JS Interface      │
-└─────────────────────────────────────────────┘`,
+    diagram: {
+      nodes: [
+        { id: 'app', label: 'Native App (Host)', icon: Smartphone, x: 20, y: 50 },
+        { id: 'wv', label: 'WebView (Chrome)', icon: Layers, x: 50, y: 50, color: 'border-chart-3' },
+        { id: 'web', label: 'Web App (SPA)', icon: Globe, x: 80, y: 50 },
+      ],
+      edges: [
+        { from: 'app', to: 'wv', label: 'Host' },
+        { from: 'wv', to: 'web', label: 'Container' },
+      ]
+    },
     prosBackend: [
       "Reutiliza codigo web no mobile",
       "Deploy sem App Store (atualizacao OTA)",
@@ -142,23 +147,23 @@ const architectures: ArchitectureData[] = [
     seo: 90,
     latency: 15,
     description: "Logica executando na CDN, antes de chegar no servidor de origem. E como ter uma Lambda rodando em cada POP (Point of Presence) do CloudFront. Latencia minima.",
-    diagram: `                    ┌─────────────┐
-                    │   Origin    │
-                    │   Server    │
-                    └──────┬──────┘
-                           │ (fallback)
-    ┌──────────────────────┼──────────────────────┐
-    │                      │                      │
-┌───┴───┐            ┌─────┴─────┐           ┌────┴────┐
-│ Edge  │            │   Edge    │           │  Edge   │
-│ SP    │            │   NYC     │           │  Tokyo  │
-│ <10ms │            │   <10ms   │           │  <10ms  │
-└───┬───┘            └─────┬─────┘           └────┬────┘
-    │                      │                      │
-┌───┴───┐            ┌─────┴─────┐           ┌────┴────┐
-│ User  │            │   User    │           │  User   │
-│Brazil │            │   USA     │           │  Japan  │
-└───────┘            └───────────┘           └─────────┘`,
+    diagram: {
+      nodes: [
+        { id: 'origin', label: 'Origin Server', icon: Cloud, x: 50, y: 20 },
+        { id: 'edge1', label: 'Edge SP', icon: Zap, x: 20, y: 50, color: 'border-chart-4' },
+        { id: 'edge2', label: 'Edge NYC', icon: Zap, x: 50, y: 50, color: 'border-chart-4' },
+        { id: 'edge3', label: 'Edge Tokyo', icon: Zap, x: 80, y: 50, color: 'border-chart-4' },
+        { id: 'u1', label: 'User Brazil', icon: Activity, x: 20, y: 80 },
+        { id: 'u2', label: 'User USA', icon: Activity, x: 50, y: 80 },
+        { id: 'u3', label: 'User Japan', icon: Activity, x: 80, y: 80 },
+      ],
+      edges: [
+        { from: 'origin', to: 'edge2', label: 'Fallback' },
+        { from: 'edge1', to: 'u1', animated: true, label: '<10ms' },
+        { from: 'edge2', to: 'u2', animated: true, label: '<10ms' },
+        { from: 'edge3', to: 'u3', animated: true, label: '<10ms' },
+      ]
+    },
     prosBackend: [
       "Latencia minima (codigo perto do usuario)",
       "Carga no origin server drasticamente reduzida",
@@ -221,7 +226,7 @@ export function ArchitectureSpectrumSection() {
                 {arch.id.toUpperCase()}
               </span>
               {selected === arch.id && (
-                <div className={`absolute -bottom-px left-1/2 h-0.5 w-12 -translate-x-1/2 bg-${arch.color}`} />
+                <div className={cn("absolute -bottom-px left-1/2 h-0.5 w-12 -translate-x-1/2", `bg-${arch.color}`)} />
               )}
             </button>
           )
@@ -244,7 +249,11 @@ export function ArchitectureSpectrumSection() {
 
         <p className="mb-6 text-foreground/90">{current.description}</p>
 
-        <AsciiDiagram title="Fluxo de Request">{current.diagram}</AsciiDiagram>
+        <DynamicDiagram 
+          title="Fluxo de Request"
+          nodes={current.diagram.nodes}
+          edges={current.diagram.edges}
+        />
 
         {/* Metrics */}
         <div className="mt-6 grid gap-4 md:grid-cols-4">
@@ -311,7 +320,7 @@ export function ArchitectureSpectrumSection() {
               <tr
                 key={arch.id}
                 className={cn(
-                  "border-b border-border/50 transition-colors",
+                  "border-b border-border/50 transition-colors cursor-pointer",
                   selected === arch.id ? "bg-secondary/50" : "hover:bg-secondary/30"
                 )}
                 onClick={() => setSelected(arch.id)}
@@ -358,7 +367,7 @@ function MetricBar({
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-secondary">
         <div
-          className={`h-full bg-${color} transition-all duration-500`}
+          className={cn("h-full transition-all duration-500", `bg-${color}`)}
           style={{ width: `${value}%` }}
         />
       </div>

@@ -1,8 +1,9 @@
 "use client"
 
-import { AsciiDiagram } from "@/components/ascii-diagram"
 import { ComparisonTable } from "@/components/comparison-table"
+import { DynamicDiagram } from "@/components/dynamic-diagram"
 import { MFEMemorySimulator } from "@/components/interactive/mfe-memory-simulator"
+import { Box, Container, Cpu, Monitor, Server } from "lucide-react"
 
 export function MFEIntroSection() {
   return (
@@ -20,57 +21,41 @@ export function MFEIntroSection() {
         Cada um tem seu proprio container, memoria e escopo.
       </p>
 
-      <AsciiDiagram title="Backend: Microservicos Isolados">
-{`BACKEND MICROSERVICES (Silos Isolados)
-
-┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
-│   Container A   │  │   Container B   │  │   Container C   │
-│  ┌───────────┐  │  │  ┌───────────┐  │  │  ┌───────────┐  │
-│  │  Service  │  │  │  │  Service  │  │  │  │  Service  │  │
-│  │   Auth    │  │  │  │   Cart    │  │  │  │  Catalog  │  │
-│  └───────────┘  │  │  └───────────┘  │  │  └───────────┘  │
-│                 │  │                 │  │                 │
-│  Memory: 512MB  │  │  Memory: 256MB  │  │  Memory: 1GB    │
-│  Node: v18      │  │  Python 3.11    │  │  Go 1.21        │
-│                 │  │                 │  │                 │
-└─────────────────┘  └─────────────────┘  └─────────────────┘
-        │                    │                    │
-        └────────────────────┴────────────────────┘
-                             │
-                      [API Gateway]
-                             │
-                      Network I/O`}
-      </AsciiDiagram>
+      <DynamicDiagram 
+        title="Backend: Microservicos Isolados"
+        nodes={[
+          { id: 'ca', label: 'Container A (Auth)', icon: Container, x: 20, y: 30, color: 'border-blue-500/50' },
+          { id: 'cb', label: 'Container B (Cart)', icon: Container, x: 50, y: 30, color: 'border-yellow-500/50' },
+          { id: 'cc', label: 'Container C (Catalog)', icon: Container, x: 80, y: 30, color: 'border-green-500/50' },
+          { id: 'gw', label: 'API Gateway', icon: Server, x: 50, y: 80 },
+        ]}
+        edges={[
+          { from: 'ca', to: 'gw', animated: true, label: 'JSON' },
+          { from: 'cb', to: 'gw', animated: true },
+          { from: 'cc', to: 'gw', animated: true },
+        ]}
+      />
 
       <p className="my-6 text-foreground font-medium">
         No Frontend, MFEs dividem TUDO:
       </p>
 
-      <AsciiDiagram title="Frontend: MFEs Compartilham Runtime">
-{`FRONTEND MICROFRONTENDS (Shared Runtime)
-
-┌─────────────────────────────────────────────────────────────────┐
-│                      BROWSER WINDOW                             │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │                    SINGLE DOM TREE                        │  │
-│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐      │  │
-│  │  │  MFE A  │  │  MFE B  │  │  MFE C  │  │  Shell  │      │  │
-│  │  │  Auth   │  │  Cart   │  │ Catalog │  │  (Host) │      │  │
-│  │  └────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘      │  │
-│  │       │            │            │            │            │  │
-│  │       └────────────┴────────────┴────────────┘            │  │
-│  │                         │                                 │  │
-│  └─────────────────────────┼─────────────────────────────────┘  │
-│                            │                                    │
-│  ┌─────────────────────────┼─────────────────────────────────┐  │
-│  │                   SHARED MEMORY                           │  │
-│  │  window.*, document.*, localStorage, sessionStorage       │  │
-│  │  Global CSS, Event Listeners, Prototype Chain             │  │
-│  └───────────────────────────────────────────────────────────┘  │
-│                                                                 │
-│                      SINGLE MAIN THREAD                         │
-└─────────────────────────────────────────────────────────────────┘`}
-      </AsciiDiagram>
+      <DynamicDiagram 
+        title="Frontend: MFEs Compartilham Runtime"
+        nodes={[
+          { id: 'win', label: 'Browser Window', icon: Monitor, x: 50, y: 50, color: 'border-primary' },
+          { id: 'mfe1', label: 'MFE Auth', icon: Box, x: 20, y: 30 },
+          { id: 'mfe2', label: 'MFE Cart', icon: Box, x: 50, y: 30 },
+          { id: 'mfe3', label: 'MFE Catalog', icon: Box, x: 80, y: 30 },
+          { id: 'memo', label: 'Shared Memory (Heap)', icon: Cpu, x: 50, y: 80, color: 'border-accent' },
+        ]}
+        edges={[
+          { from: 'mfe1', to: 'win' },
+          { from: 'mfe2', to: 'win' },
+          { from: 'mfe3', to: 'win' },
+          { from: 'win', to: 'memo', animated: true, label: 'Shared State' },
+        ]}
+      />
 
       <ComparisonTable
         headers={["Backend Microservices", "Frontend Microfrontends"]}

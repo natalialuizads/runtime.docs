@@ -1,8 +1,9 @@
 "use client"
 
-import { AsciiDiagram } from "@/components/ascii-diagram"
 import { CodeBlock } from "@/components/code-block"
 import { ComparisonTable } from "@/components/comparison-table"
+import { DynamicDiagram } from "@/components/dynamic-diagram"
+import { Box, FileCode, Layers, Layout, Network, PlaySquare, Zap } from "lucide-react"
 
 export function ModuleFederationSection() {
   return (
@@ -23,36 +24,19 @@ export function ModuleFederationSection() {
         em tempo de execucao:
       </p>
 
-      <AsciiDiagram title="Dynamic Linking: Backend vs Frontend">
-{`BACKEND: Dynamic Linking (Linux)
-                                          
-┌─────────────────┐      ┌─────────────────┐
-│    app.exe      │      │   libc.so.6     │
-│  ┌───────────┐  │      │  ┌───────────┐  │
-│  │  main()   │──┼──────┼─▶│  printf() │  │
-│  └───────────┘  │      │  └───────────┘  │
-└─────────────────┘      └─────────────────┘
-                                ▲
-┌─────────────────┐             │
-│   another.exe   │─────────────┘
-│  (reusa libc)   │   Mesma copia em memoria
-└─────────────────┘
-
-
-FRONTEND: Module Federation (Webpack 5)
-                                          
-┌─────────────────┐      ┌─────────────────┐
-│   MFE Header    │      │  react@shared   │
-│  ┌───────────┐  │      │  ┌───────────┐  │
-│  │ Component │──┼──────┼─▶│ useState  │  │
-│  └───────────┘  │      │  └───────────┘  │
-└─────────────────┘      └─────────────────┘
-                                ▲
-┌─────────────────┐             │
-│    MFE Cart     │─────────────┘
-│  (reusa react)  │   Mesma copia em memoria
-└─────────────────┘`}
-      </AsciiDiagram>
+      <DynamicDiagram 
+        title="Dynamic Linking: Backend vs Frontend"
+        nodes={[
+          { id: 'app', label: 'app.exe', icon: PlaySquare, x: 20, y: 30 },
+          { id: 'lib', label: 'libc.so.6', icon: FileCode, x: 80, y: 30, color: 'border-primary' },
+          { id: 'shell', label: 'MFE Shell', icon: Layout, x: 20, y: 70 },
+          { id: 'react', label: 'react@shared', icon: Layers, x: 80, y: 70, color: 'border-accent' },
+        ]}
+        edges={[
+          { from: 'app', to: 'lib', animated: true, label: 'printf()' },
+          { from: 'shell', to: 'react', animated: true, label: 'useState' },
+        ]}
+      />
 
       <ComparisonTable
         headers={["Conceito Backend", "Equivalente Module Federation"]}
@@ -121,37 +105,23 @@ module.exports = {
         <h3 className="mb-4 font-mono text-lg font-semibold text-primary">
           O Fluxo de Resolucao
         </h3>
-        <AsciiDiagram title="Runtime Module Resolution">
-{`1. Usuario acessa shell.example.com
-   │
-   ▼
-2. Shell carrega e executa seu bundle
-   │
-   ├─▶ React 18.2.0 carregado (primeira vez)
-   │
-   ▼
-3. Shell precisa renderizar <Header />
-   │
-   ▼
-4. Webpack Runtime: "Header esta em mfe_header remote"
-   │
-   ▼
-5. Fetch: cdn.example.com/header/remoteEntry.js
-   │
-   ▼
-6. MFE Header inicializa
-   │
-   ├─▶ Precisa de React?
-   │   │
-   │   ▼
-   │   Webpack: "React ja existe no Shell, versao compativel"
-   │   │
-   │   ▼
-   │   REUSA o React do Shell (ZERO bytes adicionais!)
-   │
-   ▼
-7. Header renderiza no DOM do Shell`}
-        </AsciiDiagram>
+        <DynamicDiagram 
+          title="Runtime Module Resolution"
+          nodes={[
+            { id: 'user', label: 'User', icon: Network, x: 10, y: 20 },
+            { id: 'shell', label: 'Shell Bundle', icon: Layout, x: 30, y: 20 },
+            { id: 'react', label: 'React 18', icon: Layers, x: 50, y: 50, color: 'border-accent' },
+            { id: 'remote', label: 'Remote MFE', icon: Box, x: 70, y: 20 },
+            { id: 'done', label: 'Rendered', icon: Zap, x: 90, y: 20, color: 'border-primary' },
+          ]}
+          edges={[
+            { from: 'user', to: 'shell', animated: true },
+            { from: 'shell', to: 'react', label: 'Init' },
+            { from: 'shell', to: 'remote', animated: true, label: 'Fetch' },
+            { from: 'remote', to: 'react', label: 'Shared' },
+            { from: 'remote', to: 'done', animated: true },
+          ]}
+        />
       </div>
 
       <h3 className="mb-4 mt-12 font-mono text-lg font-semibold text-foreground">

@@ -2,24 +2,23 @@
 
 import React from "react"
 
-import { useState } from "react"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import {
-  Package,
-  Layers,
-  ShoppingCart,
-  User,
-  CreditCard,
-  Search,
-  Bell,
-  Settings,
-  ArrowRight,
-  Scissors,
-  RefreshCw,
-  AlertTriangle,
-  CheckCircle2,
+    AlertTriangle,
+    Bell,
+    CheckCircle2,
+    CreditCard,
+    Layers,
+    Package,
+    RefreshCw,
+    Scissors,
+    Search,
+    Settings,
+    ShoppingCart,
+    User
 } from "lucide-react"
+import { useState } from "react"
 
 interface Module {
   id: string
@@ -112,8 +111,8 @@ export function MonolithBreaker() {
         {/* Monolith Side */}
         <div
           className={cn(
-            "rounded-lg border-2 p-4 transition-all",
-            mode === "monolith" ? "border-destructive/50 bg-destructive/5" : "border-border bg-secondary/30"
+            "rounded-lg border-2 p-4 transition-all shadow-sm",
+            mode === "monolith" ? "border-destructive/50 bg-destructive/10 dark:bg-destructive/5" : "border-border bg-card"
           )}
         >
           <div className="mb-4 flex items-center justify-between">

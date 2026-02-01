@@ -1,9 +1,10 @@
 "use client"
 
-import { AsciiDiagram } from "@/components/ascii-diagram"
 import { CodeBlock } from "@/components/code-block"
-import { TimelineVisual } from "@/components/timeline-visual"
+import { DynamicDiagram } from "@/components/dynamic-diagram"
 import { LayoutShiftDemo } from "@/components/interactive/layout-shift-demo"
+import { TimelineVisual } from "@/components/timeline-visual"
+import { AlertTriangle, Box, Cpu, FileCode, Layout, Timer } from "lucide-react"
 
 export function MFEProblemsSection() {
   return (
@@ -27,31 +28,20 @@ export function MFEProblemsSection() {
           O que acontece quando temos 3 versoes de React/Angular rodando:
         </p>
 
-        <AsciiDiagram title="Dependency Duplication na Memoria">
-{`MEMORIA DO BROWSER (Heap)
-
-┌────────────────────────────────────────────────────────────────┐
-│                                                                │
-│  MFE Header (Team A)     MFE Cart (Team B)    MFE Catalog (C) │
-│  ┌──────────────────┐    ┌──────────────────┐ ┌─────────────┐ │
-│  │ React 17.0.2     │    │ React 18.2.0     │ │ React 18.0  │ │
-│  │ ~150KB parsed    │    │ ~180KB parsed    │ │ ~175KB      │ │
-│  ├──────────────────┤    ├──────────────────┤ ├─────────────┤ │
-│  │ Lodash 4.17.15   │    │ Lodash 4.17.21   │ │ Lodash full │ │
-│  │ ~75KB            │    │ ~75KB            │ │ ~75KB       │ │
-│  ├──────────────────┤    ├──────────────────┤ ├─────────────┤ │
-│  │ Moment.js        │    │ date-fns         │ │ Moment.js   │ │
-│  │ ~300KB           │    │ ~30KB            │ │ ~300KB      │ │
-│  └──────────────────┘    └──────────────────┘ └─────────────┘ │
-│                                                                │
-│  TOTAL DUPLICADO:                                              │
-│  React: 150 + 180 + 175 = 505KB (vs 180KB se compartilhado)   │
-│  Lodash: 75 × 3 = 225KB (vs 75KB se compartilhado)            │
-│  Date libs: 630KB (vs ~30KB se padronizado)                    │
-│                                                                │
-│  MEMORIA DESPERDICADA: ~1MB+ apenas em duplicatas             │
-└────────────────────────────────────────────────────────────────┘`}
-        </AsciiDiagram>
+        <DynamicDiagram 
+          title="Dependency Duplication na Memoria (Heap)"
+          nodes={[
+            { id: 'm1', label: 'MFE Header (R17)', icon: Box, x: 20, y: 30 },
+            { id: 'm2', label: 'MFE Cart (R18)', icon: Box, x: 50, y: 30 },
+            { id: 'm3', label: 'MFE Catalog (R18.1)', icon: Box, x: 80, y: 30 },
+            { id: 'heap', label: 'Main Thread Heap', icon: Cpu, x: 50, y: 70, color: 'border-destructive' },
+          ]}
+          edges={[
+            { from: 'm1', to: 'heap', animated: true, label: '+150KB' },
+            { from: 'm2', to: 'heap', animated: true, label: '+180KB' },
+            { from: 'm3', to: 'heap', animated: true, label: '+175KB' },
+          ]}
+        />
 
         <div className="my-6 rounded-lg border border-chart-4/30 bg-chart-4/10 p-4">
           <h4 className="mb-2 font-mono text-sm font-semibold text-chart-4">Analogia Backend</h4>
@@ -74,47 +64,31 @@ export function MFEProblemsSection() {
           Como o carregamento assincrono de modulos causa saltos visuais:
         </p>
 
-        <AsciiDiagram title="Cumulative Layout Shift">
-{`TIMELINE DE CARREGAMENTO
-
-T=0ms    Shell carrega, reserva espacos
-         ┌────────────────────────────────┐
-         │  [Header: 60px]                │
-         │  [    Conteudo vazio    ]      │
-         │  [Footer: 40px]                │
-         └────────────────────────────────┘
-
-T=200ms  MFE Header carrega (tinha mais conteudo!)
-         ┌────────────────────────────────┐
-         │  [Header: 120px] ← DOBROU!     │  ← SHIFT!
-         │  [    Conteudo vazio    ]      │  ← Empurrado pra baixo
-         │  [Footer: 40px]                │
-         └────────────────────────────────┘
-         
-         Usuario estava clicando em "Login"
-         Agora clicou em "Carrinho" sem querer!
-
-T=500ms  MFE Banner promocional injeta no meio
-         ┌────────────────────────────────┐
-         │  [Header: 120px]               │
-         │  [BANNER: 200px] ← NOVO!       │  ← SHIFT!
-         │  [    Conteudo    ]            │  ← Empurrado de novo
-         │  [Footer: 40px]                │
-         └────────────────────────────────┘
-
-CLS Score: 0.45 (RUIM - Google penaliza > 0.1)`}
-        </AsciiDiagram>
-
-        <TimelineVisual
-          title="Impacto do CLS na UX"
-          maxDuration={100}
-          items={[
-            { label: "CLS = 0.05 (Bom)", duration: 10, color: "accent" },
-            { label: "CLS = 0.15 (Okay)", duration: 35, color: "primary" },
-            { label: "CLS = 0.25 (Ruim)", duration: 60, color: "destructive" },
-            { label: "CLS = 0.45 (Terrivel)", duration: 100, color: "destructive", blocked: true },
+        <DynamicDiagram 
+          title="Cumulative Layout Shift"
+          nodes={[
+            { id: 't0', label: 'T=0: Shell', icon: Layout, x: 20, y: 30 },
+            { id: 't200', label: 'T=200: Header Load', icon: AlertTriangle, x: 50, y: 30, color: 'border-destructive' },
+            { id: 't500', label: 'T=500: Banner Injected', icon: AlertTriangle, x: 80, y: 30, color: 'border-destructive' },
+          ]}
+          edges={[
+            { from: 't0', to: 't200', animated: true, label: 'Shift!' },
+            { from: 't200', to: 't500', animated: true, label: 'Push!' },
           ]}
         />
+
+        <div className="my-8">
+          <TimelineVisual
+            title="Impacto do CLS na UX"
+            maxDuration={100}
+            items={[
+              { label: "CLS = 0.05 (Bom)", duration: 10, color: "accent" },
+              { label: "CLS = 0.15 (Okay)", duration: 35, color: "primary" },
+              { label: "CLS = 0.25 (Ruim)", duration: 60, color: "destructive" },
+              { label: "CLS = 0.45 (Terrivel)", duration: 100, color: "destructive", blocked: true },
+            ]}
+          />
+        </div>
 
         <div className="mt-6">
           <h4 className="mb-4 font-mono text-sm font-semibold text-foreground">
@@ -135,48 +109,25 @@ CLS Score: 0.45 (RUIM - Google penaliza > 0.1)`}
           O Shell (o "API Gateway" do front) pode se tornar um gargalo:
         </p>
 
-        <AsciiDiagram title="Shell como Gargalo">
-{`                    SHELL (Orquestrador)
-                           │
-                           ▼
-         ┌─────────────────┴─────────────────┐
-         │      Carrega manifesto.json       │
-         │           ~100ms RTT              │
-         └─────────────────┬─────────────────┘
-                           │
-                           ▼
-         ┌─────────────────┴─────────────────┐
-         │   Resolve dependencias de MFEs    │
-         │          ~50ms CPU                │
-         └─────────────────┬─────────────────┘
-                           │
-           ┌───────────────┼───────────────┐
-           ▼               ▼               ▼
-     ┌──────────┐    ┌──────────┐    ┌──────────┐
-     │ Fetch    │    │ Fetch    │    │ Fetch    │
-     │ MFE A    │    │ MFE B    │    │ MFE C    │
-     │ ~200ms   │    │ ~300ms   │    │ ~150ms   │
-     └────┬─────┘    └────┬─────┘    └────┬─────┘
-          │               │               │
-          ▼               ▼               ▼
-     ┌──────────┐    ┌──────────┐    ┌──────────┐
-     │ Parse +  │    │ Parse +  │    │ Parse +  │
-     │ Execute  │    │ Execute  │    │ Execute  │
-     │ ~100ms   │    │ ~150ms   │    │ ~80ms    │
-     └──────────┘    └──────────┘    └──────────┘
+        <DynamicDiagram 
+          title="Shell como Gargalo (Waterfall)"
+          nodes={[
+            { id: 'shell', label: 'Shell (Auth/Routes)', icon: Layout, x: 50, y: 15 },
+            { id: 'mani', label: 'manifest.json', icon: FileCode, x: 50, y: 40 },
+            { id: 'mfe1', label: 'MFE A', icon: Box, x: 20, y: 70 },
+            { id: 'mfe2', label: 'MFE B', icon: Box, x: 50, y: 70 },
+            { id: 'mfe3', label: 'MFE C', icon: Box, x: 80, y: 70 },
+          ]}
+          edges={[
+            { from: 'shell', to: 'mani', animated: true, label: '100ms' },
+            { from: 'mani', to: 'mfe1', animated: true },
+            { from: 'mani', to: 'mfe2', animated: true },
+            { from: 'mani', to: 'mfe3', animated: true },
+          ]}
+        />
 
-TEMPO TOTAL SEM OTIMIZACAO:
-100ms (manifest) + 50ms (resolve) + 300ms (slowest fetch) 
-+ 150ms (slowest parse) = ~600ms
-
-COM PRE-FETCHING E CACHE:
-0ms (cached manifest) + 0ms (cached resolve) + 50ms (cache hit)
-+ 150ms (parse) = ~200ms
-
-GANHO: 3x mais rapido`}
-        </AsciiDiagram>
-
-        <CodeBlock language="javascript" filename="shell-optimizations.js">
+        <div className="my-8">
+          <CodeBlock language="javascript" filename="shell-optimizations.js">
 {`// PROBLEMA: Waterfall de requisicoes
 async function loadMFEs() {
   const manifest = await fetch('/manifest.json'); // Espera
@@ -191,17 +142,15 @@ async function loadMFEs() {
 <link rel="preload" href="/manifest.json" as="fetch">
 
 // No Shell:
-const manifestPromise = fetch('/manifest.json'); // Ja iniciou!
-
-// Module Federation (Webpack 5):
-// Dependencias compartilhadas carregam UMA vez
-// MFEs "linkam" em runtime (como DLLs)`}
-        </CodeBlock>
+const manifestPromise = fetch('/manifest.json'); // Ja iniciou!`}
+          </CodeBlock>
+        </div>
       </div>
 
       {/* Morte por Mil Cortes */}
-      <div className="rounded-lg border-2 border-destructive/50 bg-destructive/10 p-6">
-        <h3 className="mb-4 font-mono text-lg font-semibold text-destructive">
+      <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6">
+        <h3 className="mb-4 font-mono text-lg font-semibold text-destructive flex items-center gap-2">
+          <Timer className="h-5 w-5" />
           Morte por Mil Cortes
         </h3>
         <p className="mb-4 text-sm text-destructive/80">
@@ -217,7 +166,7 @@ const manifestPromise = fetch('/manifest.json'); // Ja iniciou!
             { label: "MFE Sidebar (+100ms)", duration: 450, color: "destructive" },
             { label: "MFE Footer (+100ms)", duration: 550, color: "destructive" },
             { label: "MFE Analytics (+100ms)", duration: 650, color: "destructive" },
-            { label: "TOTAL", duration: 800, color: "destructive", blocked: true },
+            { label: "TOTAL (800ms Blocking)", duration: 800, color: "destructive", blocked: true },
           ]}
         />
         <p className="mt-4 text-sm text-foreground font-medium">

@@ -1,8 +1,9 @@
 "use client"
 
-import { AsciiDiagram } from "@/components/ascii-diagram"
 import { CodeBlock } from "@/components/code-block"
+import { DynamicDiagram } from "@/components/dynamic-diagram"
 import { CRPPipeline } from "@/components/interactive/crp-pipeline"
+import { Box, ExternalLink, FileCode, FileJson, FileType, GitBranch, Globe, Layers, Layout, Paintbrush } from "lucide-react"
 
 export function CRPSection() {
   return (
@@ -20,44 +21,30 @@ export function CRPSection() {
         transforma texto (HTML/CSS) em pixels:
       </p>
 
-      <AsciiDiagram title="Critical Rendering Path (Build Pipeline)">
-{`                    CRITICAL RENDERING PATH
-                    (Build Pipeline do Browser)
-
-     ┌──────────┐      ┌──────────┐      ┌──────────┐
-     │   HTML   │      │   CSS    │      │    JS    │
-     │  (Source)│      │ (Styles) │      │ (Logic)  │
-     └────┬─────┘      └────┬─────┘      └────┬─────┘
-          │                 │                 │
-          ▼                 ▼                 │
-     ┌──────────┐      ┌──────────┐           │
-     │   DOM    │      │  CSSOM   │           │
-     │  (Tree)  │      │  (Tree)  │           │
-     └────┬─────┘      └────┬─────┘           │
-          │                 │                 │
-          └────────┬────────┘                 │
-                   │                          │
-                   ▼                          │
-             ┌──────────┐                     │
-             │  Render  │◄────────────────────┘
-             │   Tree   │   (pode modificar DOM/CSSOM)
-             └────┬─────┘
-                  │
-                  ▼
-             ┌──────────┐
-             │  Layout  │  ← Calcula geometria (x, y, width, height)
-             └────┬─────┘
-                  │
-                  ▼
-             ┌──────────┐
-             │  Paint   │  ← Rasteriza pixels
-             └────┬─────┘
-                  │
-                  ▼
-             ┌──────────┐
-             │Composite │  ← Combina layers (GPU)
-             └──────────┘`}
-      </AsciiDiagram>
+      <DynamicDiagram 
+        title="Critical Rendering Path (Build Pipeline)"
+        nodes={[
+          { id: 'html', label: 'HTML', icon: FileCode, x: 10, y: 30 },
+          { id: 'css', label: 'CSS', icon: FileType, x: 30, y: 30 },
+          { id: 'js', label: 'JS', icon: FileJson, x: 50, y: 30 },
+          { id: 'dom', label: 'DOM', icon: GitBranch, x: 10, y: 60, color: 'border-chart-1' },
+          { id: 'cssom', label: 'CSSOM', icon: GitBranch, x: 30, y: 60, color: 'border-chart-3' },
+          { id: 'rt', label: 'Render Tree', icon: Layout, x: 20, y: 90, color: 'border-primary' },
+          { id: 'layout', label: 'Layout', icon: Box, x: 45, y: 90, color: 'border-accent' },
+          { id: 'paint', label: 'Paint', icon: Paintbrush, x: 70, y: 90, color: 'border-accent' },
+          { id: 'comp', label: 'Composite', icon: Layers, x: 90, y: 90, color: 'border-accent' },
+        ]}
+        edges={[
+          { from: 'html', to: 'dom', animated: true },
+          { from: 'css', to: 'cssom', animated: true },
+          { from: 'js', to: 'rt', label: 'Modifies' },
+          { from: 'dom', to: 'rt' },
+          { from: 'cssom', to: 'rt' },
+          { from: 'rt', to: 'layout' },
+          { from: 'layout', to: 'paint' },
+          { from: 'paint', to: 'comp' },
+        ]}
+      />
 
       <div className="my-8 rounded-lg border border-destructive/30 bg-destructive/10 p-6">
         <h3 className="mb-4 font-mono text-lg font-semibold text-destructive">
@@ -99,24 +86,21 @@ h1 { display: none; }`}
         Isso e chamado <strong className="text-destructive">FOUC (Flash of Unstyled Content)</strong> — uma UX terrivel.
       </p>
 
-      <AsciiDiagram title="CSS Render Blocking Timeline">
-{`Timeline:
-
-[HTML Parse]──────────────────────────────────────────►
-             │
-             ├─[Encontra <link>]
-             │        │
-             │        ▼
-             │  [CSS Download]═══════════════════► (I/O Network)
-             │                                  │
-             │  [CSSOM Build]◄──────────────────┘
-             │        │
-             └────────┴────► [Render Tree] → [Layout] → [Paint]
-                             
-                             ▲
-                             │
-                    BLOCKED ATE CSSOM PRONTO`}
-      </AsciiDiagram>
+      <DynamicDiagram 
+        title="CSS Render Blocking Timeline"
+        nodes={[
+          { id: 'html', label: 'HTML Parse', icon: FileCode, x: 10, y: 50 },
+          { id: 'link', label: '<link> found', icon: ExternalLink, x: 40, y: 50 },
+          { id: 'io', label: 'Network I/O', icon: Globe, x: 40, y: 20, color: 'border-destructive' },
+          { id: 'rt', label: 'Render Tree', icon: Layout, x: 75, y: 50, color: 'border-destructive' },
+        ]}
+        edges={[
+          { from: 'html', to: 'link', animated: true },
+          { from: 'link', to: 'io', animated: true, label: 'Wait' },
+          { from: 'io', to: 'rt', animated: true, label: 'Success' },
+          { from: 'link', to: 'rt', label: 'BLOCKED', animated: false },
+        ]}
+      />
 
       <div className="my-8 rounded-lg border border-accent/30 bg-accent/10 p-6">
         <h3 className="mb-4 font-mono text-lg font-semibold text-accent">Analogia Backend</h3>

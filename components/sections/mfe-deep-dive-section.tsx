@@ -1,10 +1,11 @@
 "use client"
 
-import { AsciiDiagram } from "@/components/ascii-diagram"
 import { CodeBlock } from "@/components/code-block"
-import { MonolithBreaker } from "@/components/interactive/monolith-breaker"
+import { DynamicDiagram } from "@/components/dynamic-diagram"
 import { AppShellOrchestrator } from "@/components/interactive/app-shell-orchestrator"
+import { MonolithBreaker } from "@/components/interactive/monolith-breaker"
 import { SpotifySquadModel } from "@/components/interactive/spotify-squad-model"
+import { Box, Globe, Layers, Layout } from "lucide-react"
 
 export function MFEDeepDiveSection() {
   return (
@@ -115,41 +116,26 @@ export function MFEDeepDiveSection() {
         <h3 className="mb-4 text-xl font-bold text-foreground">
           3. Arquitetura de Referencia
         </h3>
-        <AsciiDiagram title="MFE Architecture (Backend View)">
-{`                        ┌─────────────────────────────────────────┐
-                        │              CDN (Edge)                 │
-                        │   Static Assets + Module Federation     │
-                        └─────────────────┬───────────────────────┘
-                                          │
-                        ┌─────────────────▼───────────────────────┐
-                        │            APP SHELL                    │
-                        │     (API Gateway do Frontend)           │
-                        │  - Routing      - Auth State            │
-                        │  - Orchestration - Error Boundaries     │
-                        └─────────────────┬───────────────────────┘
-                                          │
-            ┌─────────────────────────────┼─────────────────────────────┐
-            │                             │                             │
-┌───────────▼───────────┐   ┌─────────────▼───────────┐   ┌─────────────▼───────────┐
-│     MFE: Header       │   │     MFE: Dashboard      │   │     MFE: Checkout       │
-│  ┌─────────────────┐  │   │  ┌─────────────────┐    │   │  ┌─────────────────┐    │
-│  │ React 18        │  │   │  │ Vue 3           │    │   │  │ React 18        │    │
-│  │ @platform-team  │  │   │  │ @analytics-team │    │   │  │ @checkout-team  │    │
-│  └─────────────────┘  │   │  └─────────────────┘    │   │  └─────────────────┘    │
-└───────────┬───────────┘   └─────────────┬───────────┘   └─────────────┬───────────┘
-            │                             │                             │
-            │     Shared Dependencies (Module Federation)              │
-            │     ┌───────────────────────────────────────────────┐    │
-            └────►│  React | Design System | Auth SDK | Utils    │◄───┘
-                  └───────────────────────────────────────────────┘
-                                          │
-            ┌─────────────────────────────┼─────────────────────────────┐
-            │                             │                             │
-┌───────────▼───────────┐   ┌─────────────▼───────────┐   ┌─────────────▼───────────┐
-│    Backend: User      │   │   Backend: Analytics    │   │   Backend: Payment      │
-│    Microservice       │   │   Microservice          │   │   Microservice          │
-└───────────────────────┘   └─────────────────────────┘   └─────────────────────────┘`}
-        </AsciiDiagram>
+        <DynamicDiagram 
+          title="MFE Architecture (Backend View)"
+          nodes={[
+            { id: 'cdn', label: 'CDN (Edge)', icon: Globe, x: 50, y: 15, color: 'border-chart-4' },
+            { id: 'shell', label: 'App Shell', icon: Layout, x: 50, y: 40, color: 'border-primary' },
+            { id: 'mfe1', label: 'MFE: Header', icon: Box, x: 20, y: 65 },
+            { id: 'mfe2', label: 'MFE: Dashboard', icon: Box, x: 50, y: 65 },
+            { id: 'mfe3', label: 'MFE: Checkout', icon: Box, x: 80, y: 65 },
+            { id: 'deps', label: 'Shared Deps', icon: Layers, x: 50, y: 85, color: 'border-accent' },
+          ]}
+          edges={[
+            { from: 'cdn', to: 'shell', animated: true },
+            { from: 'shell', to: 'mfe1', animated: true },
+            { from: 'shell', to: 'mfe2', animated: true },
+            { from: 'shell', to: 'mfe3', animated: true },
+            { from: 'mfe1', to: 'deps' },
+            { from: 'mfe2', to: 'deps' },
+            { from: 'mfe3', to: 'deps' },
+          ]}
+        />
       </div>
 
       {/* Spotify Squad Model */}

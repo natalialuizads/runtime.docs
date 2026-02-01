@@ -1,8 +1,9 @@
 "use client"
 
-import { AsciiDiagram } from "@/components/ascii-diagram"
-import { TimelineVisual } from "@/components/timeline-visual"
+import { DynamicDiagram } from "@/components/dynamic-diagram"
 import { BundleCalculator } from "@/components/interactive/bundle-calculator"
+import { TimelineVisual } from "@/components/timeline-visual"
+import { Box, Check, Container, Cpu, FileCode, Globe, ImageIcon, Play, Zap } from "lucide-react"
 
 export function BundleSection() {
   return (
@@ -19,46 +20,39 @@ export function BundleSection() {
         No backend, voce conhece o <strong className="text-foreground">Cold Start</strong> de Lambdas/Cloud Functions:
       </p>
 
-      <AsciiDiagram title="Lambda Cold Start">
-{`Lambda Cold Start:
-┌─────────────────────────────────────────────────────────┐
-│  [Download Container] → [Init Runtime] → [Execute]     │
-│       ~200ms              ~300ms           ~50ms        │
-│                                                         │
-│  Total: ~550ms (primeira execucao)                     │
-└─────────────────────────────────────────────────────────┘`}
-      </AsciiDiagram>
+      <DynamicDiagram 
+        title="Lambda Cold Start"
+        nodes={[
+          { id: 'dl', label: 'Download Container', icon: Container, x: 20, y: 50 },
+          { id: 'init', label: 'Init Runtime', icon: Play, x: 50, y: 50, color: 'border-chart-4' },
+          { id: 'exec', label: 'Execute', icon: Zap, x: 80, y: 50, color: 'border-primary' },
+        ]}
+        edges={[
+          { from: 'dl', to: 'init', animated: true, label: '~200ms' },
+          { from: 'init', to: 'exec', animated: true, label: '~300ms' },
+        ]}
+      />
 
       <p className="my-6 text-foreground font-medium">
         JavaScript no Browser tem o mesmo problema:
       </p>
 
-      <AsciiDiagram title="JS Bundle Cold Start">
-{`JS Bundle "Cold Start":
-┌─────────────────────────────────────────────────────────┐
-│                                                         │
-│  [Network Download]   O arquivo viaja pela rede         │
-│       ~200ms          (I/O bound - depende da conexao)  │
-│          │                                              │
-│          ▼                                              │
-│  [Decompress/Decode]  Descompacta gzip/brotli           │
-│       ~20ms                                             │
-│          │                                              │
-│          ▼                                              │
-│  [Parse/Tokenize]     Le o texto JS, gera AST          │
-│       ~100ms          (CPU bound!)                      │
-│          │                                              │
-│          ▼                                              │
-│  [Compile/Optimize]   V8 compila para bytecode         │
-│       ~150ms          (CPU bound!)                      │
-│          │                                              │
-│          ▼                                              │
-│  [Execute]            Roda o codigo                     │
-│       ~50ms           (CPU bound!)                      │
-│                                                         │
-│  Total: ~520ms para um bundle de 500KB                 │
-└─────────────────────────────────────────────────────────┘`}
-      </AsciiDiagram>
+      <DynamicDiagram 
+        title="JS Bundle Cold Start"
+        nodes={[
+          { id: 'net', label: 'Network Download', icon: Globe, x: 10, y: 30 },
+          { id: 'zip', label: 'Decompress', icon: Box, x: 30, y: 30 },
+          { id: 'parse', label: 'Parse/Tokenize', icon: FileCode, x: 50, y: 30, color: 'border-destructive' },
+          { id: 'comp', label: 'Compile', icon: Cpu, x: 70, y: 30, color: 'border-destructive' },
+          { id: 'exec', label: 'Execute', icon: Zap, x: 90, y: 30, color: 'border-primary' },
+        ]}
+        edges={[
+          { from: 'net', to: 'zip', animated: true, label: 'I/O' },
+          { from: 'zip', to: 'parse', animated: true },
+          { from: 'parse', to: 'comp', animated: true, label: 'CPU' },
+          { from: 'comp', to: 'exec', animated: true },
+        ]}
+      />
 
       <div className="my-8 rounded-lg border border-destructive/30 bg-destructive/10 p-6">
         <h3 className="mb-4 font-mono text-lg font-semibold text-destructive">O Erro Comum</h3>
@@ -75,24 +69,21 @@ export function BundleSection() {
         Comparacao de Custos por Tipo de Arquivo
       </h3>
 
-      <AsciiDiagram title="200KB: JPEG vs JavaScript">
-{`┌─────────────────────────────────────────────────────────┐
-│           CUSTO DE 200KB POR TIPO DE ARQUIVO           │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  200KB JPEG:   [Download]────────► [Decode GPU] → Done │
-│                  ~150ms               ~5ms              │
-│                                                         │
-│  200KB JS:     [Download]──► [Parse]──► [Compile]──►   │
-│                  ~150ms       ~80ms      ~120ms         │
-│                                                         │
-│                             ──► [Execute] → Done       │
-│                                   ~50ms                 │
-│                                                         │
-│  JPEG Total:  ~155ms                                   │
-│  JS Total:    ~400ms  (2.5x mais caro!)               │
-└─────────────────────────────────────────────────────────┘`}
-      </AsciiDiagram>
+      <DynamicDiagram 
+        title="200KB: JPEG vs JavaScript"
+        nodes={[
+          { id: 'net', label: 'Download (200KB)', icon: Globe, x: 15, y: 30 },
+          { id: 'jpeg', label: 'JPEG (GPU)', icon: ImageIcon, x: 50, y: 15, color: 'border-green-500' },
+          { id: 'js', label: 'JS (CPU)', icon: FileCode, x: 50, y: 45, color: 'border-destructive' },
+          { id: 'done', label: 'Ready', icon: Check, x: 85, y: 30, color: 'border-primary' },
+        ]}
+        edges={[
+          { from: 'net', to: 'jpeg', animated: true, label: '~150ms' },
+          { from: 'net', to: 'js', animated: true, label: '~150ms' },
+          { from: 'jpeg', to: 'done', label: '+5ms' },
+          { from: 'js', to: 'done', animated: true, label: '+250ms' },
+        ]}
+      />
 
       <TimelineVisual
         title="Mesmo bundle de 1MB, hardware diferente:"

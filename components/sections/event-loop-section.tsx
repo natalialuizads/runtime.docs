@@ -1,9 +1,10 @@
 "use client"
 
-import { AsciiDiagram } from "@/components/ascii-diagram"
 import { CodeBlock } from "@/components/code-block"
 import { ComparisonTable } from "@/components/comparison-table"
+import { DynamicDiagram } from "@/components/dynamic-diagram"
 import { EventLoopSimulator } from "@/components/interactive/event-loop-simulator"
+import { Activity, Clock, Code2, Cpu, Layers, Layout } from "lucide-react"
 
 export function EventLoopSection() {
   return (
@@ -26,20 +27,20 @@ export function EventLoopSection() {
         <p className="text-foreground font-medium">No Browser, voce nao tem esse luxo.</p>
       </div>
 
-      <AsciiDiagram title="Arquitetura do Main Thread">
-{`┌─────────────────────────────────────────────────────────────────┐
-│                        MAIN THREAD                              │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐             │
-│  │ JavaScript  │  │  DOM/CSSOM  │  │   Layout    │             │
-│  │  Execution  │  │   Parsing   │  │  & Paint    │             │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘             │
-│         │                │                │                     │
-│         └────────────────┴────────────────┘                     │
-│                          │                                      │
-│                    SINGLE CPU CORE                              │
-│              (Time-Sliced Execution)                            │
-└─────────────────────────────────────────────────────────────────┘`}
-      </AsciiDiagram>
+      <DynamicDiagram 
+        title="Arquitetura do Main Thread"
+        nodes={[
+          { id: 'js', label: 'JS Execution', icon: Code2, x: 20, y: 40, color: 'border-yellow-500/50' },
+          { id: 'dom', label: 'DOM/CSSOM', icon: Layers, x: 50, y: 40, color: 'border-blue-500/50' },
+          { id: 'paint', label: 'Layout & Paint', icon: Layout, x: 80, y: 40, color: 'border-green-500/50' },
+          { id: 'cpu', label: 'Single CPU Core', icon: Cpu, x: 50, y: 80, color: 'border-primary' },
+        ]}
+        edges={[
+          { from: 'js', to: 'cpu', animated: true },
+          { from: 'dom', to: 'cpu', animated: true },
+          { from: 'paint', to: 'cpu', animated: true },
+        ]}
+      />
 
       <div className="my-8 rounded-lg border border-chart-4/30 bg-chart-4/10 p-4">
         <h3 className="mb-3 font-mono text-sm font-semibold text-chart-4">
@@ -50,20 +51,22 @@ export function EventLoopSection() {
         </p>
       </div>
 
-      <AsciiDiagram title="Request Queue Blocking">
-{`[Request Queue]
-    │
-    ▼
-┌─────────────────────────────────────────┐
-│           SINGLE WORKER                 │
-│                                         │
-│  Request 1: GET /health    → 1ms   ✓   │
-│  Request 2: GET /users     → 5ms   ✓   │
-│  Request 3: POST /compute  → 3000ms ⏳ │  ← BLOCKING!
-│  Request 4: GET /health    → ???   🔒  │  ← Waiting...
-│  Request 5: GET /health    → ???   🔒  │  ← Waiting...
-└─────────────────────────────────────────┘`}
-      </AsciiDiagram>
+      <DynamicDiagram 
+        title="Request Queue Blocking"
+        nodes={[
+          { id: 'q', label: 'Request Queue', icon: Clock, x: 20, y: 50 },
+          { id: 'worker', label: 'Single Worker', icon: Activity, x: 60, y: 50, color: 'border-destructive' },
+          { id: 'r1', label: 'GET /health', x: 85, y: 20 },
+          { id: 'r2', label: 'POST /compute', x: 85, y: 50, color: 'border-destructive' },
+          { id: 'r3', label: 'GET /health (WAIT)', x: 85, y: 80 },
+        ]}
+        edges={[
+          { from: 'q', to: 'worker', animated: true, label: 'Incoming' },
+          { from: 'worker', to: 'r1', label: 'Done' },
+          { from: 'worker', to: 'r2', animated: true, label: 'BLOCKING' },
+          { from: 'worker', to: 'r3', label: 'Locked' },
+        ]}
+      />
 
       <p className="my-6 text-muted-foreground">
         Enquanto <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-sm text-foreground">POST /compute</code> executa, 
@@ -97,17 +100,6 @@ export function EventLoopSection() {
           O usuario percebe "jank" (travamento visual).
         </p>
       </div>
-
-      <AsciiDiagram title="Timeline de Frames (60 FPS target)">
-{`Timeline (60 FPS target):
-│
-├── Frame 1: 16ms ──────────────────┤ ✓ Smooth
-├── Frame 2: 16ms ──────────────────┤ ✓ Smooth
-├── Frame 3: [█████ JS 50ms █████████████████] ✗ JANK!
-├── Frame 4: (dropped)
-├── Frame 5: (dropped)
-├── Frame 6: 16ms ──────────────────┤ ✓ Recovery`}
-      </AsciiDiagram>
 
       <CodeBlock language="javascript" filename="frame-budget-violation.js">
 {`// Isso causa JANK

@@ -1,7 +1,7 @@
 "use client"
 
-import { Terminal, Server, Monitor, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ArrowRight, Monitor, Server, Terminal } from "lucide-react"
 
 interface HeroSectionProps {
   onStart: () => void
@@ -10,12 +10,12 @@ interface HeroSectionProps {
 export function HeroSection({ onStart }: HeroSectionProps) {
   return (
     <section className="relative min-h-[80vh] overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent dark:from-primary/5" />
       
       <div className="relative mx-auto max-w-6xl px-4 py-20 sm:py-32">
-        <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2">
+        <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/15 px-4 py-2 dark:bg-primary/10">
           <Terminal className="h-4 w-4 text-primary" />
-          <span className="font-mono text-xs text-primary">Para Engenheiros de Backend</span>
+          <span className="font-mono text-xs text-primary font-semibold tracking-wide">Para Engenheiros de Backend</span>
         </div>
         
         <h1 className="mb-6 max-w-4xl text-balance font-sans text-4xl font-bold leading-tight text-foreground sm:text-5xl md:text-6xl">

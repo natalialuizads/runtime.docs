@@ -1,7 +1,8 @@
 "use client"
 
 import { DebugChallenge } from "@/components/debug-challenge"
-import { AsciiDiagram } from "@/components/ascii-diagram"
+import { DynamicDiagram } from "@/components/dynamic-diagram"
+import { AlertTriangle, Box, CheckCircle2, Layout, Paintbrush } from "lucide-react"
 
 export function ChallengeTwoSection() {
   return (
@@ -14,39 +15,26 @@ export function ChallengeTwoSection() {
         </p>
       </div>
 
-      <AsciiDiagram title="O Cenario do Bug">
-{`PRODUCAO - Segunda-feira, 9:00 AM
+      <DynamicDiagram 
+        title="O Cenario do Bug"
+        nodes={[
+          { id: 'ha', label: 'MFE Header v2.3', icon: Layout, x: 20, y: 30, color: 'border-destructive' },
+          { id: 'css', label: 'Global CSS (.btn)', icon: Paintbrush, x: 50, y: 30, color: 'border-destructive' },
+          { id: 'cart', label: 'MFE Cart (Unchanged)', icon: Box, x: 80, y: 30 },
+          { id: 'bug', label: 'Visual Regression', icon: AlertTriangle, x: 50, y: 70, color: 'border-destructive' },
+        ]}
+        edges={[
+          { from: 'ha', to: 'css', label: 'Deploy' },
+          { from: 'css', to: 'cart', animated: true, label: 'Collision' },
+          { from: 'cart', to: 'bug', animated: true },
+        ]}
+      />
 
-Time A deploya MFE Header v2.3.0
-┌─────────────────────────────────────┐
-│  MFE Header v2.3.0                  │
-│  - Atualiza estilos do botao        │
-│  - Adiciona CSS global:             │
-│    .btn { padding: 8px 16px; }      │
-│    .btn-primary { background: blue; }│
-└─────────────────────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────┐
-│  MFE Cart (Team B) - NAO MUDOU      │
-│  - Botao "Checkout" usa .btn        │
-│  - Esperava padding: 12px 24px      │
-│  - Cor era verde (brand color)      │
-│                                     │
-│  RESULTADO:                         │
-│  - Botao encolheu                   │
-│  - Cor mudou para azul              │
-│  - Clientes reclamando              │
-└─────────────────────────────────────┘
-
-         BUG EM PRODUCAO!
-         Time B nem sabia do deploy do Time A`}
-      </AsciiDiagram>
-
-      <DebugChallenge
-        title="CSS Global Collision"
-        scenario="O Time A deployou uma atualizacao no MFE Header que inclui CSS global. O Time B, sem fazer nenhuma mudanca, comecou a receber tickets de bug porque o botao de Checkout do carrinho mudou de aparencia."
-        backendApproach={`# Backend: Cada servico tem seu proprio banco/schema
+      <div className="my-10">
+        <DebugChallenge
+          title="CSS Global Collision"
+          scenario="O Time A deployou uma atualizacao no MFE Header que inclui CSS global. O Time B, sem fazer nenhuma mudanca, comecou a receber tickets de bug porque o botao de Checkout do carrinho mudou de aparencia."
+          backendApproach={`# Backend: Cada servico tem seu proprio banco/schema
 # Service A altera sua tabela: OK
 # Service A altera tabela do Service B: ERRO de permissao
 
@@ -55,15 +43,15 @@ CREATE SCHEMA service_a;
 CREATE SCHEMA service_b;
 GRANT ALL ON SCHEMA service_a TO service_a_user;
 -- service_a_user NAO consegue alterar service_b`}
-        problem="No frontend, nao existe 'schema isolation' por padrao. CSS global e como dar GRANT ALL em todas as tabelas para todos os servicos. Qualquer MFE pode (acidentalmente) quebrar qualquer outro MFE."
-        hints={[
-          "CSS Modules ou CSS-in-JS geram classes unicas por componente (scoping automatico)",
-          "Shadow DOM cria um boundary de encapsulamento real (Web Components)",
-          "BEM ou outras convencoes de nomenclatura podem funcionar como 'namespaces'",
-          "PostCSS pode prefixar automaticamente todas as classes de um MFE",
-          "Pense em como o Kubernetes usa namespaces para isolar recursos",
-        ]}
-        solution={`// SOLUCAO 1: CSS Modules (Scoping via Build)
+          problem="No frontend, nao existe 'schema isolation' por padrao. CSS global e como dar GRANT ALL em todas as tabelas para todos os servicos. Qualquer MFE pode (acidentalmente) quebrar qualquer outro MFE."
+          hints={[
+            "CSS Modules ou CSS-in-JS geram classes unicas por componente (scoping automatico)",
+            "Shadow DOM cria um boundary de encapsulamento real (Web Components)",
+            "BEM ou outras convencoes de nomenclatura podem funcionar como 'namespaces'",
+            "PostCSS pode prefixar automaticamente todas as classes de um MFE",
+            "Pense em como o Kubernetes usa namespaces para isolar recursos",
+          ]}
+          solution={`// SOLUCAO 1: CSS Modules (Scoping via Build)
 // header.module.css
 .btn { padding: 8px 16px; }
 // Compila para: .Header_btn_x7ks2 { ... }
@@ -100,7 +88,8 @@ module.exports = {
 // ANALOGIA BACKEND:
 // E como colocar cada servico em seu proprio namespace K8s
 // com Network Policies que impedem comunicacao nao autorizada`}
-      />
+        />
+      </div>
 
       <div className="mt-12 rounded-lg border border-primary/30 bg-primary/10 p-6">
         <h3 className="mb-4 font-mono text-lg font-semibold text-primary">
@@ -111,20 +100,20 @@ module.exports = {
         </p>
         <ul className="space-y-2 text-sm text-muted-foreground">
           <li className="flex items-start gap-2">
-            <span className="text-primary">→</span>
-            O Browser e um <strong className="text-foreground">runtime hostil</strong> que voce nao controla
+            <CheckCircle2 className="mt-1 h-4 w-4 text-primary shrink-0" />
+            <span>O Browser e um <strong className="text-foreground">runtime hostil</strong> que voce nao controla</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-primary">→</span>
-            Frontend nao escala horizontalmente - <strong className="text-foreground">otimizacao e obrigatoria</strong>
+            <CheckCircle2 className="mt-1 h-4 w-4 text-primary shrink-0" />
+            <span>Frontend nao escala horizontalmente - <strong className="text-foreground">otimizacao e obrigatoria</strong></span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-primary">→</span>
-            MFEs sao <strong className="text-foreground">sistemas distribuidos</strong> sem o isolamento que voce esta acostumado
+            <CheckCircle2 className="mt-1 h-4 w-4 text-primary shrink-0" />
+            <span>MFEs sao <strong className="text-foreground">sistemas distribuidos</strong> sem o isolamento que voce esta acostumado</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-primary">→</span>
-            Arquitetura ruim no frontend = <strong className="text-foreground">morte por mil cortes</strong> na UX
+            <CheckCircle2 className="mt-1 h-4 w-4 text-primary shrink-0" />
+            <span>Arquitetura ruim no frontend = <strong className="text-foreground">morte por mil cortes</strong> na UX</span>
           </li>
         </ul>
       </div>

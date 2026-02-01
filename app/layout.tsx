@@ -1,7 +1,7 @@
-import React from "react"
+import { Analytics } from '@vercel/analytics/next'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
+import React from "react"
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -30,16 +30,25 @@ export const metadata: Metadata = {
   },
 }
 
+import { ThemeProvider } from "@/components/theme-provider"
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        {children}
-        <Analytics />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   )
