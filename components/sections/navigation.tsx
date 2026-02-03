@@ -30,6 +30,7 @@ const sections = [
   { id: "arch-spectrum", label: "Arquiteturas", icon: GitBranch },
   { id: "mfe-deep-dive", label: "MFE Deep Dive", icon: Package },
   { id: "mfe-integration", label: "Integração", icon: Link2 },
+  { id: "composition-strategies", label: "Composição", icon: Boxes },
   { id: "mfe-patterns", label: "Padrões", icon: Layout },
   { id: "spotify-model", label: "Spotify", icon: Boxes },
   { id: "mfe-intro", label: "MFE ≠ MS", icon: Cpu },

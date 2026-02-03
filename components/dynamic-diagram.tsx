@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 import ReactFlow, {
@@ -67,8 +68,14 @@ export function DynamicDiagram({
     },
   }));
 
-  const [nodes] = useNodesState(flowNodes);
-  const [edges] = useEdgesState(flowEdges);
+  const [nodes, setNodes] = useNodesState(flowNodes);
+  const [edges, setEdges] = useEdgesState(flowEdges);
+
+  // Update nodes and edges when inputs change
+  useEffect(() => {
+    setNodes(flowNodes);
+    setEdges(flowEdges);
+  }, [inputNodes, inputEdges, setNodes, setEdges]);
 
   return (
     <div

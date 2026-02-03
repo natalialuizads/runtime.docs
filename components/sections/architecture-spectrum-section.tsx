@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 
-type ArchitectureType = "spa" | "ssg" | "ssr" | "webview" | "edge";
+type ArchitectureType = "spa" | "ssg" | "ssr" | "webview";
 
 interface ArchitectureData {
   id: ArchitectureType;
@@ -278,69 +278,6 @@ const architectures: ArchitectureData[] = [
       "Debug mais complexo (dois runtimes)",
     ],
   },
-  {
-    id: "edge",
-    name: "Edge Computing",
-    backendAnalogy: "Lambda@Edge / Cloudflare Workers",
-    icon: Zap,
-    example: "NY Times, Shopify, Netflix",
-    color: "chart-4",
-    serverLoad: 10,
-    infraComplexity: 85,
-    seo: 90,
-    latency: 15,
-    description:
-      "Lógica executando na CDN, antes de chegar no servidor de origem. É como ter uma Lambda rodando em cada POP (Point of Presence) do CloudFront. Latência mínima.",
-    diagram: {
-      nodes: [
-        { id: "u1", label: "User Brazil", icon: Activity, x: 10, y: 20 },
-        { id: "u2", label: "User USA", icon: Activity, x: 10, y: 50 },
-        { id: "u3", label: "User Japan", icon: Activity, x: 10, y: 80 },
-        {
-          id: "edge1",
-          label: "Edge SP",
-          icon: Zap,
-          x: 40,
-          y: 20,
-          color: "border-chart-4",
-        },
-        {
-          id: "edge2",
-          label: "Edge NYC",
-          icon: Zap,
-          x: 40,
-          y: 50,
-          color: "border-chart-4",
-        },
-        {
-          id: "edge3",
-          label: "Edge Tokyo",
-          icon: Zap,
-          x: 40,
-          y: 80,
-          color: "border-chart-4",
-        },
-        { id: "origin", label: "Origin Server", icon: Cloud, x: 70, y: 50 },
-      ],
-      edges: [
-        { from: "u1", to: "edge1", animated: true, label: "<5ms" },
-        { from: "edge1", to: "origin", animated: true, label: "Fallback" },
-        { from: "u2", to: "edge2", animated: true, label: "<10ms" },
-        { from: "u3", to: "edge3", animated: true, label: "<15ms" },
-        { from: "edge2", to: "origin", animated: true, label: "Cache miss" },
-      ],
-    },
-    prosBackend: [
-      "Latencia minima (codigo perto do usuario)",
-      "Carga no origin server drasticamente reduzida",
-      "Personalizacao sem hit no backend",
-    ],
-    consBackend: [
-      "Runtime limitado (sem Node.js completo)",
-      "Debug em producao e complexo",
-      "Cold start em cada POP",
-    ],
-  },
 ];
 
 export function ArchitectureSpectrumSection() {
@@ -363,7 +300,7 @@ export function ArchitectureSpectrumSection() {
       </div>
 
       {/* Architecture Selector */}
-      <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-5">
+      <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
         {architectures.map((arch) => {
           const Icon = arch.icon;
           return (

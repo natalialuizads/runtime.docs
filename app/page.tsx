@@ -6,6 +6,7 @@ import { ArchitectureSpectrumSection } from "@/components/sections/architecture-
 import { BundleSection } from "@/components/sections/bundle-section";
 import { ChallengeOneSection } from "@/components/sections/challenge-one-section";
 import { ChallengeTwoSection } from "@/components/sections/challenge-two-section";
+import { CompositionStrategiesSection } from "@/components/sections/composition-strategies-section";
 import { EventLoopSection } from "@/components/sections/event-loop-section";
 import { HeroSection } from "@/components/sections/hero-section";
 import { MFEDeepDiveSection } from "@/components/sections/mfe-deep-dive-section";
@@ -29,6 +30,7 @@ export default function BrowserRuntimeDocs() {
     "arch-spectrum": useRef<HTMLDivElement>(null),
     "mfe-deep-dive": useRef<HTMLDivElement>(null),
     "mfe-integration": useRef<HTMLDivElement>(null),
+    "composition-strategies": useRef<HTMLDivElement>(null),
     "mfe-patterns": useRef<HTMLDivElement>(null),
     "spotify-model": useRef<HTMLDivElement>(null),
     "mfe-intro": useRef<HTMLDivElement>(null),
@@ -73,6 +75,11 @@ export default function BrowserRuntimeDocs() {
       id: "mfe-integration",
       title: "Integration Runtime",
       content: <MFEIntegrationSection />,
+    },
+    {
+      id: "composition-strategies",
+      title: "Composition Strategies",
+      content: <CompositionStrategiesSection />,
     },
     {
       id: "mfe-patterns",
@@ -215,6 +222,13 @@ export default function BrowserRuntimeDocs() {
         <div className="border-t-4 border-primary/30 bg-gradient-to-b from-primary/5 to-transparent">
           <div ref={sectionRefs["mfe-integration"]}>
             <MFEIntegrationSection />
+          </div>
+
+          <div
+            className="border-t border-border/50"
+            ref={sectionRefs["composition-strategies"]}
+          >
+            <CompositionStrategiesSection />
           </div>
 
           <div
