@@ -5,7 +5,6 @@ import { ArchitectureSpectrumSection } from "@/components/sections/architecture-
 import { BundleSection } from "@/components/sections/bundle-section"
 import { ChallengeOneSection } from "@/components/sections/challenge-one-section"
 import { ChallengeTwoSection } from "@/components/sections/challenge-two-section"
-import { CRPSection } from "@/components/sections/crp-section"
 import { EventLoopSection } from "@/components/sections/event-loop-section"
 import { HeroSection } from "@/components/sections/hero-section"
 import { MFEDeepDiveSection } from "@/components/sections/mfe-deep-dive-section"
@@ -41,7 +40,6 @@ export default function BrowserRuntimeDocs() {
   const slides = [
     { id: "intro", title: "Introdução", content: <HeroSection onStart={() => handleSectionChange("event-loop")} /> },
     { id: "event-loop", title: "The Event Loop", content: <EventLoopSection /> },
-    { id: "crp", title: "Critical Rendering Path", content: <CRPSection /> },
     { id: "bundle", title: "The Cost of JavaScript", content: <BundleSection /> },
     { id: "challenge-1", title: "Debug Challenge #1", content: <ChallengeOneSection /> },
     { id: "arch-spectrum", title: "Architecture Spectrum", content: <ArchitectureSpectrumSection /> },
@@ -130,10 +128,6 @@ export default function BrowserRuntimeDocs() {
         <div className="border-t border-border bg-gradient-to-b from-secondary/30 to-transparent">
           <div ref={sectionRefs["event-loop"]}>
             <EventLoopSection />
-          </div>
-
-          <div className="border-t border-border/50" ref={sectionRefs.crp}>
-            <CRPSection />
           </div>
 
           <div className="border-t border-border/50" ref={sectionRefs.bundle}>

@@ -13,7 +13,6 @@ interface NavigationProps {
 const sections = [
   { id: "intro", label: "Intro", icon: Terminal },
   { id: "event-loop", label: "Event Loop", icon: Cpu },
-  { id: "crp", label: "Critical Path", icon: Layers },
   { id: "bundle", label: "Bundle Cost", icon: Zap },
   { id: "challenge-1", label: "Desafio #1", icon: AlertTriangle },
   { id: "arch-spectrum", label: "Arquiteturas", icon: GitBranch },

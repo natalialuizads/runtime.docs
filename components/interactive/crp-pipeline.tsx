@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { Play, RotateCcw, Pause } from "lucide-react"
+import { Play, RotateCcw } from "lucide-react"
 
 type Stage = "idle" | "html" | "css-block" | "css-download" | "dom" | "cssom" | "render" | "layout" | "paint" | "complete"
 
