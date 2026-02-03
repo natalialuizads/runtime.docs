@@ -1,16 +1,20 @@
-"use client"
+"use client";
 
-import { DebugChallenge } from "@/components/debug-challenge"
+import { DebugChallenge } from "@/components/debug-challenge";
 
 export function ChallengeOneSection() {
   return (
     <section className="mx-auto max-w-4xl px-4 py-16">
       <div className="mb-8">
-        <div className="mb-2 font-mono text-sm text-destructive">CHECKPOINT</div>
-        <h2 className="mb-4 text-3xl font-bold text-foreground">Desafio de Debug #1</h2>
+        <div className="mb-2 font-mono text-sm text-destructive">
+          CHECKPOINT
+        </div>
+        <h2 className="mb-4 text-3xl font-bold text-foreground">
+          Desafio de Debug #1
+        </h2>
         <p className="text-lg text-muted-foreground">
-          Voce e um engenheiro backend acostumado a resolver problemas com paralelizacao.
-          Como voce aplica esse conhecimento no frontend?
+          Você é um engenheiro backend acostumado a resolver problemas com
+          paralelização. Como você aplica esse conhecimento no frontend?
         </p>
       </div>
 
@@ -24,9 +28,9 @@ async def get_dashboard_data():
         fetch_permissions()  # I/O paralelo
     )
     return compute_dashboard(user, permissions)  # CPU em Worker Thread`}
-        problem="Um dev junior implementou isso no frontend usando Promise.all para os fetches (correto!), mas depois chama heavyDataProcessing() que demora 800ms sincronamente. Durante esses 800ms: cliques nao respondem, scroll trava, animacoes congelam."
+        problem="Um dev junior implementou isso no frontend usando Promise.all para os fetches (correto!), mas depois chama heavyDataProcessing() que demora 800ms sincronamente. Durante esses 800ms: cliques não respondem, scroll trava, animações congelam."
         hints={[
-          "Web Workers existem e rodam em threads separadas, mas nao tem acesso ao DOM",
+          "Web Workers existem e rodam em threads separadas, mas não têm acesso ao DOM",
           "requestIdleCallback permite executar codigo quando o browser esta 'ocioso'",
           "Time-slicing pode quebrar uma tarefa grande em chunks menores usando setTimeout/requestAnimationFrame",
           "Pense no pattern de 'Chunked Processing' - como um cursor de banco de dados processa batches",
@@ -56,10 +60,10 @@ function processInChunks(items, chunkSize = 100) {
   requestIdleCallback(processChunk);
 }
 
-// ANALOGIA BACKEND: E como usar um cursor de DB
+// ANALOGIA BACKEND: É como usar um cursor de DB
 // em vez de SELECT * FROM huge_table
-// voce faz SELECT ... LIMIT 100 OFFSET n`}
+// você faz SELECT ... LIMIT 100 OFFSET n`}
       />
     </section>
-  )
+  );
 }

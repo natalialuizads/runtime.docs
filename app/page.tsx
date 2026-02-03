@@ -12,7 +12,6 @@ import { MFEDeepDiveSection } from "@/components/sections/mfe-deep-dive-section"
 import { MFEIntegrationSection } from "@/components/sections/mfe-integration-section";
 import { MFEIntroSection } from "@/components/sections/mfe-intro-section";
 import { MFEPatternsSection } from "@/components/sections/mfe-patterns-section";
-import { MFEProblemsSection } from "@/components/sections/mfe-problems-section";
 import { ModuleFederationSection } from "@/components/sections/module-federation-section";
 import { Navigation } from "@/components/sections/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -33,7 +32,6 @@ export default function BrowserRuntimeDocs() {
     "mfe-patterns": useRef<HTMLDivElement>(null),
     "spotify-model": useRef<HTMLDivElement>(null),
     "mfe-intro": useRef<HTMLDivElement>(null),
-    "mfe-problems": useRef<HTMLDivElement>(null),
     "module-federation": useRef<HTMLDivElement>(null),
     "challenge-2": useRef<HTMLDivElement>(null),
   };
@@ -88,13 +86,8 @@ export default function BrowserRuntimeDocs() {
     },
     {
       id: "mfe-intro",
-      title: "Microfrontends Intro",
+      title: "MFE não é Microserviço",
       content: <MFEIntroSection />,
-    },
-    {
-      id: "mfe-problems",
-      title: "The MFE Tax",
-      content: <MFEProblemsSection />,
     },
     {
       id: "module-federation",
@@ -211,40 +204,15 @@ export default function BrowserRuntimeDocs() {
         </div>
 
         {/* FASE 1: Fundamentos - Backend vs Microfrontends */}
-        <div className="border-t-4 border-primary/30 bg-gradient-to-b from-primary/5 to-transparent">
-          <div className="mx-auto max-w-4xl px-4 py-12">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2">
-              <span className="font-mono text-xs text-primary">FASE 1</span>
-            </div>
-            <h2 className="mt-4 text-3xl font-bold text-foreground">
-              Fundamentos: Backend vs Microfrontends
-            </h2>
-            <p className="mt-2 text-lg text-muted-foreground">
-              Entender microfrontends através de analogias com infraestrutura
-              backend.
-            </p>
-          </div>
-
-          <div ref={sectionRefs["mfe-deep-dive"]}>
-            <MFEDeepDiveSection />
-          </div>
+        <div
+          className="border-t-4 border-primary/30 bg-gradient-to-b from-primary/5 to-transparent"
+          ref={sectionRefs["mfe-deep-dive"]}
+        >
+          <MFEDeepDiveSection />
         </div>
 
         {/* FASE 2: Padrões e Estratégias */}
         <div className="border-t-4 border-primary/30 bg-gradient-to-b from-primary/5 to-transparent">
-          <div className="mx-auto max-w-4xl px-4 py-12">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2">
-              <span className="font-mono text-xs text-primary">FASE 2</span>
-            </div>
-            <h2 className="mt-4 text-3xl font-bold text-foreground">
-              Padrões e Estratégias
-            </h2>
-            <p className="mt-2 text-lg text-muted-foreground">
-              Comunicação, autenticação e orquestração em arquiteturas
-              distribuídas.
-            </p>
-          </div>
-
           <div ref={sectionRefs["mfe-integration"]}>
             <MFEIntegrationSection />
           </div>
@@ -257,7 +225,7 @@ export default function BrowserRuntimeDocs() {
           </div>
 
           <div
-            className="border-t border-border/50"
+            className="border-t border-border/50 overflow-hidden"
             ref={sectionRefs["spotify-model"]}
           >
             <SpotifySquadModel />
@@ -266,27 +234,8 @@ export default function BrowserRuntimeDocs() {
 
         {/* FASE 3: Implementação e Impactos */}
         <div className="border-t-4 border-accent/30 bg-gradient-to-b from-accent/5 to-transparent">
-          <div className="mx-auto max-w-4xl px-4 py-12">
-            <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-2">
-              <span className="font-mono text-xs text-accent">FASE 3</span>
-            </div>
-            <h2 className="mt-4 text-3xl font-bold text-foreground">
-              Implementação e Impactos
-            </h2>
-            <p className="mt-2 text-lg text-muted-foreground">
-              Casos de uso, Module Federation e arquitetura em produção.
-            </p>
-          </div>
-
           <div ref={sectionRefs["mfe-intro"]}>
             <MFEIntroSection />
-          </div>
-
-          <div
-            className="border-t border-border/50"
-            ref={sectionRefs["mfe-problems"]}
-          >
-            <MFEProblemsSection />
           </div>
 
           <div

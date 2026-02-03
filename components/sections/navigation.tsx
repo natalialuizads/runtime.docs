@@ -32,8 +32,7 @@ const sections = [
   { id: "mfe-integration", label: "Integração", icon: Link2 },
   { id: "mfe-patterns", label: "Padrões", icon: Layout },
   { id: "spotify-model", label: "Spotify", icon: Boxes },
-  { id: "mfe-intro", label: "MFE Intro", icon: Cpu },
-  { id: "mfe-problems", label: "MFE Problems", icon: AlertTriangle },
+  { id: "mfe-intro", label: "MFE ≠ MS", icon: Cpu },
   { id: "module-federation", label: "Module Fed", icon: Link2 },
   { id: "challenge-2", label: "Challenge", icon: AlertTriangle },
 ];

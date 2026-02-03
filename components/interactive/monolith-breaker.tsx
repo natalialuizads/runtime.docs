@@ -1,85 +1,149 @@
-"use client"
+"use client";
 
-import React from "react"
+import React from "react";
 
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
-    AlertTriangle,
-    Bell,
-    CheckCircle2,
-    CreditCard,
-    Layers,
-    Package,
-    RefreshCw,
-    Scissors,
-    Search,
-    Settings,
-    ShoppingCart,
-    User
-} from "lucide-react"
-import { useState } from "react"
+  AlertTriangle,
+  Bell,
+  CheckCircle2,
+  CreditCard,
+  Layers,
+  Package,
+  RefreshCw,
+  Scissors,
+  Search,
+  Settings,
+  ShoppingCart,
+  User,
+} from "lucide-react";
+import { useState } from "react";
 
 interface Module {
-  id: string
-  name: string
-  icon: React.ElementType
-  team: string
-  color: string
-  extracted: boolean
-  crashed: boolean
+  id: string;
+  name: string;
+  icon: React.ElementType;
+  team: string;
+  color: string;
+  extracted: boolean;
+  crashed: boolean;
 }
 
 const initialModules: Module[] = [
-  { id: "header", name: "Header/Nav", icon: Layers, team: "Platform", color: "primary", extracted: false, crashed: false },
-  { id: "search", name: "Search", icon: Search, team: "Discovery", color: "accent", extracted: false, crashed: false },
-  { id: "catalog", name: "Catalog", icon: Package, team: "Product", color: "chart-3", extracted: false, crashed: false },
-  { id: "cart", name: "Cart", icon: ShoppingCart, team: "Checkout", color: "chart-4", extracted: false, crashed: false },
-  { id: "user", name: "User Profile", icon: User, team: "Identity", color: "chart-5", extracted: false, crashed: false },
-  { id: "payment", name: "Payment", icon: CreditCard, team: "Payments", color: "destructive", extracted: false, crashed: false },
-  { id: "notifications", name: "Notifications", icon: Bell, team: "Engagement", color: "primary", extracted: false, crashed: false },
-  { id: "settings", name: "Settings", icon: Settings, team: "Platform", color: "muted-foreground", extracted: false, crashed: false },
-]
+  {
+    id: "header",
+    name: "Header/Nav",
+    icon: Layers,
+    team: "Platform",
+    color: "primary",
+    extracted: false,
+    crashed: false,
+  },
+  {
+    id: "search",
+    name: "Search",
+    icon: Search,
+    team: "Discovery",
+    color: "accent",
+    extracted: false,
+    crashed: false,
+  },
+  {
+    id: "catalog",
+    name: "Catalog",
+    icon: Package,
+    team: "Product",
+    color: "chart-3",
+    extracted: false,
+    crashed: false,
+  },
+  {
+    id: "cart",
+    name: "Cart",
+    icon: ShoppingCart,
+    team: "Checkout",
+    color: "chart-4",
+    extracted: false,
+    crashed: false,
+  },
+  {
+    id: "user",
+    name: "User Profile",
+    icon: User,
+    team: "Identity",
+    color: "chart-5",
+    extracted: false,
+    crashed: false,
+  },
+  {
+    id: "payment",
+    name: "Payment",
+    icon: CreditCard,
+    team: "Payments",
+    color: "destructive",
+    extracted: false,
+    crashed: false,
+  },
+  {
+    id: "notifications",
+    name: "Notifications",
+    icon: Bell,
+    team: "Engagement",
+    color: "primary",
+    extracted: false,
+    crashed: false,
+  },
+  {
+    id: "settings",
+    name: "Settings",
+    icon: Settings,
+    team: "Platform",
+    color: "muted-foreground",
+    extracted: false,
+    crashed: false,
+  },
+];
 
 export function MonolithBreaker() {
-  const [modules, setModules] = useState<Module[]>(initialModules)
-  const [mode, setMode] = useState<"monolith" | "mfe">("monolith")
-  const [crashedModule, setCrashedModule] = useState<string | null>(null)
+  const [modules, setModules] = useState<Module[]>(initialModules);
+  const [mode, setMode] = useState<"monolith" | "mfe">("monolith");
+  const [crashedModule, setCrashedModule] = useState<string | null>(null);
 
-  const extractedCount = modules.filter((m) => m.extracted).length
-  const isFullyExtracted = extractedCount === modules.length
+  const extractedCount = modules.filter((m) => m.extracted).length;
+  const isFullyExtracted = extractedCount === modules.length;
 
   const toggleExtract = (id: string) => {
     setModules((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, extracted: !m.extracted } : m))
-    )
-  }
+      prev.map((m) => (m.id === id ? { ...m, extracted: !m.extracted } : m)),
+    );
+  };
 
   const extractAll = () => {
-    setModules((prev) => prev.map((m) => ({ ...m, extracted: true })))
-    setMode("mfe")
-  }
+    setModules((prev) => prev.map((m) => ({ ...m, extracted: true })));
+    setMode("mfe");
+  };
 
   const reset = () => {
-    setModules(initialModules)
-    setMode("monolith")
-    setCrashedModule(null)
-  }
+    setModules(initialModules);
+    setMode("monolith");
+    setCrashedModule(null);
+  };
 
   const simulateCrash = (id: string) => {
-    setCrashedModule(id)
+    setCrashedModule(id);
     setModules((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, crashed: true } : m))
-    )
-  }
+      prev.map((m) => (m.id === id ? { ...m, crashed: true } : m)),
+    );
+  };
 
   const clearCrash = () => {
-    setCrashedModule(null)
-    setModules((prev) => prev.map((m) => ({ ...m, crashed: false })))
-  }
+    setCrashedModule(null);
+    setModules((prev) => prev.map((m) => ({ ...m, crashed: false })));
+  };
 
   // In monolith mode, if any module crashes, ALL crash
-  const allCrashed = mode === "monolith" && crashedModule !== null
+  const allCrashed = mode === "monolith" && crashedModule !== null;
 
   return (
     <div className="rounded-xl border border-border bg-card p-6">
@@ -112,7 +176,9 @@ export function MonolithBreaker() {
         <div
           className={cn(
             "rounded-lg border-2 p-4 transition-all shadow-sm",
-            mode === "monolith" ? "border-destructive/50 bg-destructive/10 dark:bg-destructive/5" : "border-border bg-card"
+            mode === "monolith"
+              ? "border-destructive/50 bg-destructive/10 dark:bg-destructive/5"
+              : "border-border bg-card",
           )}
         >
           <div className="mb-4 flex items-center justify-between">
@@ -143,14 +209,15 @@ export function MonolithBreaker() {
               {modules
                 .filter((m) => !m.extracted)
                 .map((module) => {
-                  const Icon = module.icon
+                  const Icon = module.icon;
                   return (
                     <button
                       key={module.id}
                       onClick={() => toggleExtract(module.id)}
                       className={cn(
                         "group flex flex-col items-center gap-1 rounded-md border border-border/50 bg-secondary/50 p-2 transition-all hover:border-primary/50 hover:bg-primary/10",
-                        module.crashed && "animate-pulse border-destructive bg-destructive/20"
+                        module.crashed &&
+                          "animate-pulse border-destructive bg-destructive/20",
                       )}
                     >
                       <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
@@ -158,7 +225,7 @@ export function MonolithBreaker() {
                         {module.name}
                       </span>
                     </button>
-                  )
+                  );
                 })}
             </div>
 
@@ -180,7 +247,7 @@ export function MonolithBreaker() {
             "rounded-lg border-2 p-4 transition-all",
             mode === "mfe" || extractedCount > 0
               ? "border-accent/50 bg-accent/5"
-              : "border-border bg-secondary/30"
+              : "border-border bg-secondary/30",
           )}
         >
           <div className="mb-4 flex items-center justify-between">
@@ -196,7 +263,7 @@ export function MonolithBreaker() {
             {modules
               .filter((m) => m.extracted)
               .map((module) => {
-                const Icon = module.icon
+                const Icon = module.icon;
                 return (
                   <div
                     key={module.id}
@@ -204,7 +271,7 @@ export function MonolithBreaker() {
                       "group relative flex flex-col items-center gap-1 rounded-md border p-2 transition-all",
                       module.crashed
                         ? "border-destructive bg-destructive/20"
-                        : "border-accent/30 bg-accent/10"
+                        : "border-accent/30 bg-accent/10",
                     )}
                   >
                     {module.crashed ? (
@@ -215,7 +282,7 @@ export function MonolithBreaker() {
                     <span
                       className={cn(
                         "text-center text-xs",
-                        module.crashed ? "text-destructive" : "text-accent"
+                        module.crashed ? "text-destructive" : "text-accent",
                       )}
                     >
                       {module.name}
@@ -245,7 +312,7 @@ export function MonolithBreaker() {
                       )}
                     </div>
                   </div>
-                )
+                );
               })}
           </div>
 
@@ -271,11 +338,19 @@ export function MonolithBreaker() {
                 Isolamento de Falha Funcionando
               </h4>
               <p className="mt-1 text-sm text-foreground/80">
-                O modulo <strong>{modules.find((m) => m.id === crashedModule)?.name}</strong> crashou,
-                mas os outros continuam funcionando. No backend, isso e como ter Circuit Breakers
-                entre microservicos.
+                O modulo{" "}
+                <strong>
+                  {modules.find((m) => m.id === crashedModule)?.name}
+                </strong>{" "}
+                crashou, mas os outros continuam funcionando. No backend, isso é
+                como ter Circuit Breakers entre microservicos.
               </p>
-              <Button variant="outline" size="sm" className="mt-3 bg-transparent" onClick={clearCrash}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-3 bg-transparent"
+                onClick={clearCrash}
+              >
                 Recuperar Modulo
               </Button>
             </div>
@@ -292,7 +367,9 @@ export function MonolithBreaker() {
           <p className="text-xs text-muted-foreground">No Monolito</p>
         </div>
         <div className="text-center">
-          <p className="font-mono text-2xl font-bold text-accent">{extractedCount}</p>
+          <p className="font-mono text-2xl font-bold text-accent">
+            {extractedCount}
+          </p>
           <p className="text-xs text-muted-foreground">Microfrontends</p>
         </div>
         <div className="text-center">
@@ -303,5 +380,5 @@ export function MonolithBreaker() {
         </div>
       </div>
     </div>
-  )
+  );
 }
