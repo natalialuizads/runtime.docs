@@ -5,13 +5,11 @@ import { cn } from "@/lib/utils";
 import {
   Activity,
   Box,
-  Cloud,
   Database,
   Globe,
   Layers,
   Server,
   Smartphone,
-  Zap,
 } from "lucide-react";
 import React, { useState } from "react";
 
