@@ -4,7 +4,6 @@ import { CodeBlock } from "@/components/code-block"
 import { DynamicDiagram } from "@/components/dynamic-diagram"
 import { AppShellOrchestrator } from "@/components/interactive/app-shell-orchestrator"
 import { MonolithBreaker } from "@/components/interactive/monolith-breaker"
-import { SpotifySquadModel } from "@/components/interactive/spotify-squad-model"
 import { Box, Globe, Layers, Layout } from "lucide-react"
 
 export function MFEDeepDiveSection() {
@@ -15,10 +14,10 @@ export function MFEDeepDiveSection() {
           <span className="font-mono text-xs text-accent">DEEP DIVE</span>
         </div>
         <h2 className="mt-4 text-2xl font-bold text-foreground md:text-3xl">
-          Microfrontends: Microservicos para o Frontend
+          Microfrontends: Microsserviços para o Frontend
         </h2>
         <p className="mt-2 text-muted-foreground">
-          Se voce entende microservicos, voce ja entende 80% de MFEs. Vamos traduzir.
+          Se você entende microsserviços, você já entende 80% de MFEs. Vamos traduzir.
         </p>
       </div>
 
@@ -31,24 +30,24 @@ export function MFEDeepDiveSection() {
         <div className="grid gap-4 md:grid-cols-2">
           {[
             {
-              backend: "Microservico",
+              backend: "Microsserviço",
               frontend: "Microfrontend",
               explanation: "Unidade de deploy independente com escopo definido",
             },
             {
               backend: "API Gateway",
               frontend: "App Shell",
-              explanation: "Ponto de entrada que roteia e orquestra os modulos",
+              explanation: "Ponto de entrada que roteia e orquestra os módulos",
             },
             {
               backend: "Service Mesh (Istio)",
               frontend: "Module Federation",
-              explanation: "Permite que modulos se descubram e carreguem em runtime",
+              explanation: "Permite que módulos se descubram e carreguem em runtime",
             },
             {
               backend: "Circuit Breaker",
               frontend: "Error Boundary",
-              explanation: "Isola falhas para que um erro nao derrube tudo",
+              explanation: "Isola falhas para que um erro não derrube tudo",
             },
             {
               backend: "Container (Docker)",
@@ -58,17 +57,17 @@ export function MFEDeepDiveSection() {
             {
               backend: "Kubernetes",
               frontend: "Single-SPA",
-              explanation: "Orquestrador que gerencia lifecycle dos modulos",
+              explanation: "Orquestrador que gerencia lifecycle dos módulos",
             },
             {
               backend: "gRPC / Event Bus",
               frontend: "Custom Events / postMessage",
-              explanation: "Comunicacao entre modulos desacoplados",
+              explanation: "Comunicação entre módulos desacoplados",
             },
             {
               backend: "Shared Library (npm)",
               frontend: "Shared Dependency",
-              explanation: "Codigo comum reutilizado (design system, utils)",
+              explanation: "Código comum reutilizado (design system, utils)",
             },
           ].map((item, i) => (
             <div key={i} className="rounded-lg border border-border bg-secondary/30 p-4">
@@ -90,11 +89,11 @@ export function MFEDeepDiveSection() {
       {/* Monolith Breaker Interactive */}
       <div className="mb-12">
         <h3 className="mb-4 text-xl font-bold text-foreground">
-          1. Quebrando o Monolito
+          1. Quebrando o Monólito
         </h3>
         <p className="mb-6 text-muted-foreground">
-          Assim como voce extrai microservicos de um monolito backend, aqui voce
-          extrai MFEs de um monolito frontend. Clique nos modulos e simule falhas:
+          Assim como você extrai microsserviços de um monólito backend, aqui você
+          extrai MFEs de um monólito frontend. Clique nos módulos e simule falhas:
         </p>
         <MonolithBreaker />
       </div>
@@ -105,8 +104,8 @@ export function MFEDeepDiveSection() {
           2. O App Shell como API Gateway
         </h3>
         <p className="mb-6 text-muted-foreground">
-          O Shell e responsavel por carregar e orquestrar MFEs. Ele decide a ordem,
-          prioridade e estrategia de carregamento. Compare as estrategias:
+          O Shell é responsável por carregar e orquestrar MFEs. Ele decide a ordem,
+          prioridade e estratégia de carregamento. Compare as estratégias:
         </p>
         <AppShellOrchestrator />
       </div>
@@ -114,7 +113,7 @@ export function MFEDeepDiveSection() {
       {/* Architecture Diagram */}
       <div className="mb-12">
         <h3 className="mb-4 text-xl font-bold text-foreground">
-          3. Arquitetura de Referencia
+          3. Arquitetura de Referência
         </h3>
         <DynamicDiagram 
           title="MFE Architecture (Backend View)"
@@ -138,26 +137,14 @@ export function MFEDeepDiveSection() {
         />
       </div>
 
-      {/* Spotify Squad Model */}
-      <div className="mb-12">
-        <h3 className="mb-4 text-xl font-bold text-foreground">
-          4. Caso de Estudo: Modelo Spotify
-        </h3>
-        <p className="mb-6 text-muted-foreground">
-          O Spotify popularizou o modelo de Squads verticais. Cada squad e dona de uma
-          fatia completa: UI + API + Database. Explore a interface:
-        </p>
-        <SpotifySquadModel />
-      </div>
-
       {/* Communication Patterns */}
       <div className="mb-12">
         <h3 className="mb-4 text-xl font-bold text-foreground">
-          5. Padroes de Comunicacao
+          5. Padrões de Comunicação
         </h3>
         <p className="mb-6 text-muted-foreground">
-          MFEs precisam se comunicar sem criar acoplamento. Os padroes sao os mesmos
-          do backend: eventos, contratos e estado compartilhado minimo.
+          MFEs precisam se comunicar sem criar acoplamento. Os padrões são os mesmos
+          do backend: eventos, contratos e estado compartilhado mínimo.
         </p>
 
         <div className="grid gap-6 md:grid-cols-2">
@@ -186,17 +173,17 @@ eventBus.on('cart:item-added', (data) => {
               Shared State (Com Cautela)
             </h4>
             <CodeBlock language="typescript" filename="shared-state.ts">
-{`// Estado minimo compartilhado
+{`// Estado mínimo compartilhado
 interface SharedState {
   user: { id: string; name: string } | null;
   theme: 'light' | 'dark';
   locale: string;
 }
 
-// NAO compartilhe estado de negocio!
-// Cada MFE deve ter seu proprio estado
+// NÃO compartilhe estado de negócio!
+// Cada MFE deve ter seu próprio estado
 
-// Backend equivalente: Redis para sessao`}
+// Backend equivalente: Redis para sessão`}
             </CodeBlock>
           </div>
         </div>
@@ -205,7 +192,7 @@ interface SharedState {
       {/* Anti-patterns */}
       <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6">
         <h3 className="mb-4 font-mono text-lg font-semibold text-destructive">
-          Anti-Patterns: O Que NAO Fazer
+          Anti-Patterns: O Que NÃO Fazer
         </h3>
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -217,7 +204,7 @@ interface SharedState {
             },
             {
               title: "CSS Global",
-              description: "MFE A altera .button e quebra o botao do MFE B.",
+              description: "MFE A altera .button e quebra o botão do MFE B.",
               fix: "CSS Modules, Scoped CSS, ou prefixos",
             },
             {
@@ -226,8 +213,8 @@ interface SharedState {
               fix: "Event Bus ou State Container dedicado",
             },
             {
-              title: "Versoes Conflitantes",
-              description: "React 17 + React 18 + React 19 na mesma pagina.",
+              title: "Versões Conflitantes",
+              description: "React 17 + React 18 + React 19 na mesma página.",
               fix: "Module Federation com shared dependencies",
             },
           ].map((pattern, i) => (
@@ -236,7 +223,7 @@ interface SharedState {
                 {pattern.title}
               </h4>
               <p className="mb-2 text-sm text-foreground/70">{pattern.description}</p>
-              <p className="text-xs text-accent">Solucao: {pattern.fix}</p>
+              <p className="text-xs text-accent">Solução: {pattern.fix}</p>
             </div>
           ))}
         </div>

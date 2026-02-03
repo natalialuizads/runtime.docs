@@ -1,13 +1,25 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { AlertTriangle, Boxes, Cpu, GitBranch, Layers, Layout, Link2, Moon, Package, Sun, Terminal, Zap } from "lucide-react"
-import { useTheme } from "next-themes"
-import { useEffect, useState } from "react"
+import { cn } from "@/lib/utils";
+import {
+  AlertTriangle,
+  Boxes,
+  Cpu,
+  GitBranch,
+  Layout,
+  Link2,
+  Moon,
+  Package,
+  Sun,
+  Terminal,
+  Zap,
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 interface NavigationProps {
-  activeSection: string
-  onSectionChange: (section: string) => void
+  activeSection: string;
+  onSectionChange: (section: string) => void;
 }
 
 const sections = [
@@ -16,22 +28,26 @@ const sections = [
   { id: "bundle", label: "Bundle Cost", icon: Zap },
   { id: "challenge-1", label: "Desafio #1", icon: AlertTriangle },
   { id: "arch-spectrum", label: "Arquiteturas", icon: GitBranch },
-  { id: "mfe-intro", label: "MFE Intro", icon: Boxes },
-  { id: "mfe-patterns", label: "MFE Padrões", icon: Layout },
   { id: "mfe-deep-dive", label: "MFE Deep Dive", icon: Package },
-  { id: "mfe-problems", label: "MFE Problems", icon: AlertTriangle },
   { id: "mfe-integration", label: "Integração", icon: Link2 },
+  { id: "mfe-patterns", label: "Padrões", icon: Layout },
+  { id: "spotify-model", label: "Spotify", icon: Boxes },
+  { id: "mfe-intro", label: "MFE Intro", icon: Cpu },
+  { id: "mfe-problems", label: "MFE Problems", icon: AlertTriangle },
   { id: "module-federation", label: "Module Fed", icon: Link2 },
-  { id: "challenge-2", label: "Desafio #2", icon: AlertTriangle },
-]
+  { id: "challenge-2", label: "Challenge", icon: AlertTriangle },
+];
 
-export function Navigation({ activeSection, onSectionChange }: NavigationProps) {
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+export function Navigation({
+  activeSection,
+  onSectionChange,
+}: NavigationProps) {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -40,14 +56,16 @@ export function Navigation({ activeSection, onSectionChange }: NavigationProps) 
           <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide">
             <div className="flex shrink-0 items-center gap-2">
               <Terminal className="h-5 w-5 text-primary" />
-              <span className="font-mono text-sm font-bold text-foreground">runtime.docs</span>
+              <span className="font-mono text-sm font-bold text-foreground">
+                runtime.docs
+              </span>
             </div>
-            
+
             <div className="h-6 w-px bg-border shrink-0" />
-            
+
             <div className="flex gap-1">
               {sections.map((section) => {
-                const Icon = section.icon
+                const Icon = section.icon;
                 return (
                   <button
                     key={section.id}
@@ -56,13 +74,13 @@ export function Navigation({ activeSection, onSectionChange }: NavigationProps) 
                       "flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 font-mono text-xs transition-colors",
                       activeSection === section.id
                         ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                        : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                     )}
                   >
                     <Icon className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline">{section.label}</span>
                   </button>
-                )
+                );
               })}
             </div>
           </div>
@@ -85,5 +103,5 @@ export function Navigation({ activeSection, onSectionChange }: NavigationProps) 
         </div>
       </div>
     </nav>
-  )
+  );
 }

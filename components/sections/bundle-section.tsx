@@ -1,7 +1,6 @@
 "use client";
 
 import { DynamicDiagram } from "@/components/dynamic-diagram";
-import { BundleCalculator } from "@/components/interactive/bundle-calculator";
 import { TimelineVisual } from "@/components/timeline-visual";
 import {
   Box,
@@ -39,27 +38,27 @@ export function BundleSection() {
         title="Lambda Cold Start"
         nodes={[
           {
-            id: "dl",
-            label: "Download Container",
-            icon: Container,
-            x: 20,
-            y: 50,
+        id: "dl",
+        label: "Download Container",
+        icon: Container,
+        x: 20,
+        y: 50,
           },
           {
-            id: "init",
-            label: "Init Runtime",
-            icon: Play,
-            x: 50,
-            y: 50,
-            color: "border-chart-4",
+        id: "init",
+        label: "Inicializar Runtime",
+        icon: Play,
+        x: 50,
+        y: 50,
+        color: "border-chart-4",
           },
           {
-            id: "exec",
-            label: "Execute",
-            icon: Zap,
-            x: 80,
-            y: 50,
-            color: "border-primary",
+        id: "exec",
+        label: "Executar",
+        icon: Zap,
+        x: 80,
+        y: 50,
+        color: "border-primary",
           },
         ]}
         edges={[
@@ -75,11 +74,11 @@ export function BundleSection() {
       <DynamicDiagram
         title="JS Bundle Cold Start"
         nodes={[
-          { id: "net", label: "Network Download", icon: Globe, x: 10, y: 30 },
-          { id: "zip", label: "Decompress", icon: Box, x: 30, y: 30 },
+          { id: "net", label: "Download de Rede", icon: Globe, x: 10, y: 30 },
+          { id: "zip", label: "Descompactar", icon: Box, x: 30, y: 30 },
           {
             id: "parse",
-            label: "Parse/Tokenize",
+            label: "Parse/Análise",
             icon: FileCode,
             x: 50,
             y: 30,
@@ -87,7 +86,7 @@ export function BundleSection() {
           },
           {
             id: "comp",
-            label: "Compile",
+            label: "Compilar",
             icon: Cpu,
             x: 70,
             y: 30,
@@ -95,7 +94,7 @@ export function BundleSection() {
           },
           {
             id: "exec",
-            label: "Execute",
+            label: "Executar",
             icon: Zap,
             x: 90,
             y: 30,
@@ -119,8 +118,8 @@ export function BundleSection() {
         </blockquote>
         <p className="mt-4 text-sm text-destructive/80">
           <strong>Errado.</strong> Você resolveu apenas o I/O de rede. O tempo
-          de <strong>Parse + Compile + Execute</strong> ainda é proporcional ao
-          código.
+          de <strong>Análise + Compilação + Execução</strong> ainda é
+          proporcional ao código.
         </p>
       </div>
 
