@@ -1,20 +1,24 @@
 "use client";
 
 import { SpotifySquadModel } from "@/components/interactive/spotify-squad-model";
+import { VerticalSplitExamples } from "@/components/interactive/vertical-split-examples";
 import { PresentationMode } from "@/components/presentation-mode";
 import { ArchitectureSpectrumSection } from "@/components/sections/architecture-spectrum-section";
+import { AuthSection } from "@/components/sections/auth-section";
 import { BundleSection } from "@/components/sections/bundle-section";
 import { ChallengeOneSection } from "@/components/sections/challenge-one-section";
 import { ChallengeTwoSection } from "@/components/sections/challenge-two-section";
 import { CompositionStrategiesSection } from "@/components/sections/composition-strategies-section";
 import { EventLoopSection } from "@/components/sections/event-loop-section";
 import { HeroSection } from "@/components/sections/hero-section";
+import { MFECommunicationSection } from "@/components/sections/mfe-communication-section";
 import { MFEDeepDiveSection } from "@/components/sections/mfe-deep-dive-section";
 import { MFEIntegrationSection } from "@/components/sections/mfe-integration-section";
 import { MFEIntroSection } from "@/components/sections/mfe-intro-section";
 import { MFEPatternsSection } from "@/components/sections/mfe-patterns-section";
 import { ModuleFederationSection } from "@/components/sections/module-federation-section";
 import { Navigation } from "@/components/sections/navigation";
+import { ServerDrivenUISection } from "@/components/sections/server-driven-ui-section";
 import { useEffect, useRef, useState } from "react";
 
 export default function BrowserRuntimeDocs() {
@@ -29,10 +33,14 @@ export default function BrowserRuntimeDocs() {
     "challenge-1": useRef<HTMLDivElement>(null),
     "arch-spectrum": useRef<HTMLDivElement>(null),
     "mfe-deep-dive": useRef<HTMLDivElement>(null),
+    "mfe-communication": useRef<HTMLDivElement>(null),
     "mfe-integration": useRef<HTMLDivElement>(null),
     "composition-strategies": useRef<HTMLDivElement>(null),
     "mfe-patterns": useRef<HTMLDivElement>(null),
     "spotify-model": useRef<HTMLDivElement>(null),
+    "vertical-examples": useRef<HTMLDivElement>(null),
+    "server-driven-ui": useRef<HTMLDivElement>(null),
+    auth: useRef<HTMLDivElement>(null),
     "mfe-intro": useRef<HTMLDivElement>(null),
     "module-federation": useRef<HTMLDivElement>(null),
     "challenge-2": useRef<HTMLDivElement>(null),
@@ -72,6 +80,11 @@ export default function BrowserRuntimeDocs() {
       content: <MFEDeepDiveSection />,
     },
     {
+      id: "mfe-communication",
+      title: "Comunicação entre MFEs",
+      content: <MFECommunicationSection />,
+    },
+    {
       id: "mfe-integration",
       title: "Integration Runtime",
       content: <MFEIntegrationSection />,
@@ -90,6 +103,21 @@ export default function BrowserRuntimeDocs() {
       id: "spotify-model",
       title: "Spotify Squad Model",
       content: <SpotifySquadModel />,
+    },
+    {
+      id: "vertical-examples",
+      title: "Exemplos de Divisão Vertical",
+      content: <VerticalSplitExamples />,
+    },
+    {
+      id: "server-driven-ui",
+      title: "Server-Driven UI",
+      content: <ServerDrivenUISection />,
+    },
+    {
+      id: "auth",
+      title: "Autenticação",
+      content: <AuthSection />,
     },
     {
       id: "mfe-intro",
@@ -218,6 +246,14 @@ export default function BrowserRuntimeDocs() {
           <MFEDeepDiveSection />
         </div>
 
+        {/* Comunicação entre MFEs */}
+        <div
+          className="border-t border-border/50 bg-gradient-to-b from-accent/5 to-transparent"
+          ref={sectionRefs["mfe-communication"]}
+        >
+          <MFECommunicationSection />
+        </div>
+
         {/* FASE 2: Padrões e Estratégias */}
         <div className="border-t-4 border-primary/30 bg-gradient-to-b from-primary/5 to-transparent">
           <div ref={sectionRefs["mfe-integration"]}>
@@ -243,6 +279,24 @@ export default function BrowserRuntimeDocs() {
             ref={sectionRefs["spotify-model"]}
           >
             <SpotifySquadModel />
+          </div>
+
+          <div
+            className="border-t border-border/50"
+            ref={sectionRefs["vertical-examples"]}
+          >
+            <VerticalSplitExamples />
+          </div>
+        </div>
+
+        {/* Server-Driven UI e Autenticação */}
+        <div className="border-t-4 border-chart-4/30 bg-gradient-to-b from-chart-4/5 to-transparent">
+          <div ref={sectionRefs["server-driven-ui"]}>
+            <ServerDrivenUISection />
+          </div>
+
+          <div className="border-t border-border/50" ref={sectionRefs.auth}>
+            <AuthSection />
           </div>
         </div>
 
