@@ -13,9 +13,54 @@ export function ChallengeOneSection() {
           Desafio de Debug #1
         </h2>
         <p className="text-lg text-muted-foreground">
-          Você é um engenheiro backend acostumado a resolver problemas com
-          paralelização. Como você aplica esse conhecimento no frontend?
+          Voce e um engenheiro backend acostumado a resolver problemas com
+          paralelizacao. Como voce aplica esse conhecimento no frontend?
         </p>
+      </div>
+
+      {/* Contexto importante */}
+      <div className="mb-8 rounded-xl border border-chart-4/30 bg-chart-4/5 p-6">
+        <h3 className="mb-4 font-mono text-sm font-semibold text-chart-4">
+          Armadilhas Comuns do Frontend
+        </h3>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-lg bg-background/50 p-4">
+            <h4 className="mb-2 font-mono text-xs font-semibold text-foreground">
+              Listas Muito Grandes
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              Renderizar 10.000 itens de uma vez trava a UI. O browser precisa
+              calcular layout, pintar pixels e manter tudo na memoria.
+            </p>
+          </div>
+          <div className="rounded-lg bg-background/50 p-4">
+            <h4 className="mb-2 font-mono text-xs font-semibold text-foreground">
+              async/await Nao Resolve Tudo
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              async/await so ajuda com I/O (fetch, timers). Processamento
+              CPU-bound continua bloqueando a thread principal.
+            </p>
+          </div>
+          <div className="rounded-lg bg-background/50 p-4">
+            <h4 className="mb-2 font-mono text-xs font-semibold text-foreground">
+              Muitas Requests Simultaneas
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              Browsers limitam conexoes (6-8 por dominio). 50 fetches
+              simultaneos criam fila e competem por recursos.
+            </p>
+          </div>
+          <div className="rounded-lg bg-background/50 p-4">
+            <h4 className="mb-2 font-mono text-xs font-semibold text-foreground">
+              Dificuldade em Observabilidade
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              Diferente do backend, voce nao tem metricas de CPU/memoria em
+              tempo real. Debugging depende do DevTools do usuario.
+            </p>
+          </div>
+        </div>
       </div>
 
       <DebugChallenge

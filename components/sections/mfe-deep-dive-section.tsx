@@ -137,59 +137,7 @@ export function MFEDeepDiveSection() {
         />
       </div>
 
-      {/* Communication Patterns */}
-      <div className="mb-12">
-        <h3 className="mb-4 text-xl font-bold text-foreground">
-          5. Padrões de Comunicação
-        </h3>
-        <p className="mb-6 text-muted-foreground">
-          MFEs precisam se comunicar sem criar acoplamento. Os padrões são os mesmos
-          do backend: eventos, contratos e estado compartilhado mínimo.
-        </p>
-
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="rounded-lg border border-border bg-card p-4">
-            <h4 className="mb-3 font-mono text-sm font-semibold text-accent">
-              Event Bus (Pub/Sub)
-            </h4>
-            <CodeBlock language="typescript" filename="event-bus.ts">
-{`// MFE A: Publica evento
-eventBus.emit('cart:item-added', { 
-  productId: '123', 
-  quantity: 1 
-});
-
-// MFE B: Escuta evento
-eventBus.on('cart:item-added', (data) => {
-  updateCartCount(data);
-});
-
-// Backend equivalente: RabbitMQ / Kafka`}
-            </CodeBlock>
-          </div>
-
-          <div className="rounded-lg border border-border bg-card p-4">
-            <h4 className="mb-3 font-mono text-sm font-semibold text-primary">
-              Shared State (Com Cautela)
-            </h4>
-            <CodeBlock language="typescript" filename="shared-state.ts">
-{`// Estado mínimo compartilhado
-interface SharedState {
-  user: { id: string; name: string } | null;
-  theme: 'light' | 'dark';
-  locale: string;
-}
-
-// NÃO compartilhe estado de negócio!
-// Cada MFE deve ter seu próprio estado
-
-// Backend equivalente: Redis para sessão`}
-            </CodeBlock>
-          </div>
-        </div>
-      </div>
-
-      {/* Anti-patterns */}
+      {{/* Anti-patterns */}
       <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6">
         <h3 className="mb-4 font-mono text-lg font-semibold text-destructive">
           Anti-Patterns: O Que NÃO Fazer

@@ -95,6 +95,16 @@ export default function BrowserRuntimeDocs() {
       content: <CompositionStrategiesSection />,
     },
     {
+      id: "server-driven-ui",
+      title: "Server-Driven UI",
+      content: <ServerDrivenUISection />,
+    },
+    {
+      id: "auth",
+      title: "Autenticação",
+      content: <AuthSection />,
+    },
+    {
       id: "mfe-patterns",
       title: "MFE Patterns",
       content: <MFEPatternsSection />,
@@ -108,16 +118,6 @@ export default function BrowserRuntimeDocs() {
       id: "vertical-examples",
       title: "Exemplos de Divisão Vertical",
       content: <VerticalSplitExamples />,
-    },
-    {
-      id: "server-driven-ui",
-      title: "Server-Driven UI",
-      content: <ServerDrivenUISection />,
-    },
-    {
-      id: "auth",
-      title: "Autenticação",
-      content: <AuthSection />,
     },
     {
       id: "mfe-intro",
@@ -267,10 +267,23 @@ export default function BrowserRuntimeDocs() {
             <CompositionStrategiesSection />
           </div>
 
+          {/* Server-Driven UI - logo apos Composition (Edge) */}
           <div
             className="border-t border-border/50"
-            ref={sectionRefs["mfe-patterns"]}
+            ref={sectionRefs["server-driven-ui"]}
           >
+            <ServerDrivenUISection />
+          </div>
+
+          {/* Autenticacao */}
+          <div className="border-t border-border/50" ref={sectionRefs.auth}>
+            <AuthSection />
+          </div>
+        </div>
+
+        {/* Padrões e Exemplos */}
+        <div className="border-t-4 border-primary/30 bg-gradient-to-b from-primary/5 to-transparent">
+          <div ref={sectionRefs["mfe-patterns"]}>
             <MFEPatternsSection />
           </div>
 
@@ -286,17 +299,6 @@ export default function BrowserRuntimeDocs() {
             ref={sectionRefs["vertical-examples"]}
           >
             <VerticalSplitExamples />
-          </div>
-        </div>
-
-        {/* Server-Driven UI e Autenticação */}
-        <div className="border-t-4 border-chart-4/30 bg-gradient-to-b from-chart-4/5 to-transparent">
-          <div ref={sectionRefs["server-driven-ui"]}>
-            <ServerDrivenUISection />
-          </div>
-
-          <div className="border-t border-border/50" ref={sectionRefs.auth}>
-            <AuthSection />
           </div>
         </div>
 

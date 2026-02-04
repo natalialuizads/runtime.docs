@@ -298,54 +298,28 @@ export function CompositionStrategiesSection() {
           edges={current.diagram.edges}
         />
 
-        {/* Metrics */}
-        <div className="mt-6 grid gap-3 md:grid-cols-4">
-          <MetricCard
-            label="Latência"
-            value={current.latency}
-            inverted
-            color="destructive"
-          />
-          <MetricCard
-            label="Complexidade"
-            value={current.complexity}
-            inverted
-            color="chart-4"
-          />
-          <MetricCard
-            label="Isolamento"
-            value={current.isolation}
-            color="accent"
-          />
-          <MetricCard
-            label="Escalabilidade"
-            value={current.scalability}
-            color="primary"
-          />
-        </div>
-
         {/* Best For / Avoid */}
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <div className="rounded-lg border border-accent/30 bg-accent/5 p-4">
             <h4 className="mb-3 font-mono text-sm font-semibold text-accent">
-              ✓ Melhor para
+              Melhor para
             </h4>
             <ul className="space-y-1">
               {current.bestFor.map((item, i) => (
                 <li key={i} className="text-sm text-foreground/80">
-                  • {item}
+                  + {item}
                 </li>
               ))}
             </ul>
           </div>
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
             <h4 className="mb-3 font-mono text-sm font-semibold text-destructive">
-              ✗ Evitar quando
+              Evitar quando
             </h4>
             <ul className="space-y-1">
               {current.avoid.map((item, i) => (
                 <li key={i} className="text-sm text-foreground/80">
-                  • {item}
+                  - {item}
                 </li>
               ))}
             </ul>
@@ -371,25 +345,25 @@ export function CompositionStrategiesSection() {
             rows={strategies.map((s) => [
               s.name.split("(")[0].trim(),
               s.latency <= 30
-                ? "🟢 Baixa"
+                ? "Baixa"
                 : s.latency <= 60
-                  ? "🟡 Média"
-                  : "🔴 Alta",
+                  ? "Média"
+                  : "Alta",
               s.complexity <= 40
-                ? "🟢 Baixa"
+                ? "Baixa"
                 : s.complexity <= 70
-                  ? "🟡 Média"
-                  : "🔴 Alta",
+                  ? "Média"
+                  : "Alta",
               s.isolation >= 80
-                ? "🟢 Alto"
+                ? "Alto"
                 : s.isolation >= 40
-                  ? "🟡 Médio"
-                  : "🔴 Baixo",
+                  ? "Médio"
+                  : "Baixo",
               s.scalability >= 80
-                ? "🟢 Excelente"
+                ? "Excelente"
                 : s.scalability >= 50
-                  ? "🟡 Bom"
-                  : "🔴 Limitado",
+                  ? "Bom"
+                  : "Limitado",
               s.bestFor[0],
             ])}
           />
@@ -416,36 +390,4 @@ export function CompositionStrategiesSection() {
   );
 }
 
-function MetricCard({
-  label,
-  value,
-  inverted = false,
-  color,
-}: {
-  label: string;
-  value: number;
-  inverted?: boolean;
-  color: string;
-}) {
-  const displayValue = inverted ? 100 - value : value;
-  const getIcon = () => {
-    if (displayValue >= 70) return "🟢";
-    if (displayValue >= 40) return "🟡";
-    return "🔴";
-  };
 
-  return (
-    <div className="rounded-lg border border-border/50 bg-secondary/30 p-3">
-      <div className="text-xs text-muted-foreground mb-1">{label}</div>
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-bold text-foreground">{getIcon()}</span>
-        <div className="h-1.5 flex-1 bg-muted rounded-full overflow-hidden">
-          <div
-            className={cn("h-full transition-all", `bg-${color}`)}
-            style={{ width: `${displayValue}%` }}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}

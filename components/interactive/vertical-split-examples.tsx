@@ -95,7 +95,7 @@ const examples: ExampleData[] = [
   },
   {
     id: "banking",
-    name: "Banking App (Nubank-like)",
+    name: "Banking App (Itau)",
     description:
       "Divisão por produto financeiro: conta, cartão, investimentos.",
     mfes: [

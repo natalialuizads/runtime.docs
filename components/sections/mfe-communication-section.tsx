@@ -216,26 +216,26 @@ export function MFECommunicationSection() {
         </p>
       </div>
 
-      {/* Code Examples */}
+      {/* Code Examples - Show selected pattern */}
       <div className="mb-12">
         <h3 className="mb-6 text-xl font-bold text-foreground">
-          Implementações Práticas
+          Implementação Prática
         </h3>
 
-        <div className="space-y-6">
-          {/* Event Bus */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <h4 className="mb-4 font-mono text-sm font-semibold text-accent flex items-center gap-2">
-              <Radio className="h-4 w-4" />
-              Event Bus (Pub/Sub Pattern)
-            </h4>
-            <p className="mb-4 text-sm text-muted-foreground">
-              O padrão mais desacoplado. MFEs publicam e escutam eventos sem
-              conhecer uns aos outros.
-            </p>
-            <div className="grid gap-4 md:grid-cols-2">
-              <CodeBlock language="typescript" filename="event-bus.ts">
-                {`// Implementação simples de Event Bus
+        <div className="rounded-xl border border-border bg-card p-6">
+          {selectedPattern === "events" && (
+            <>
+              <h4 className="mb-4 font-mono text-sm font-semibold text-accent flex items-center gap-2">
+                <Radio className="h-4 w-4" />
+                Event Bus (Pub/Sub Pattern)
+              </h4>
+              <p className="mb-4 text-sm text-muted-foreground">
+                O padrao mais desacoplado. MFEs publicam e escutam eventos sem
+                conhecer uns aos outros.
+              </p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <CodeBlock language="typescript" filename="event-bus.ts">
+                  {`// Implementação simples de Event Bus
 type EventHandler = (data: any) => void;
 
 class EventBus {
@@ -247,7 +247,6 @@ class EventBus {
     }
     this.handlers.get(event)!.add(handler);
     
-    // Retorna unsubscribe
     return () => this.handlers.get(event)?.delete(handler);
   }
 
@@ -262,19 +261,16 @@ class EventBus {
   }
 }
 
-// Singleton global
 export const eventBus = new EventBus();`}
-              </CodeBlock>
+                </CodeBlock>
 
-              <CodeBlock language="typescript" filename="usage-example.ts">
-                {`// MFE Cart: Publica quando item é adicionado
+                <CodeBlock language="typescript" filename="usage-example.ts">
+                  {`// MFE Cart: Publica quando item é adicionado
 import { eventBus } from '@shell/event-bus';
 
 function addToCart(product: Product) {
-  // Lógica local
   cart.push(product);
   
-  // Notifica outros MFEs
   eventBus.publish('cart:item-added', {
     productId: product.id,
     quantity: 1,
@@ -290,24 +286,82 @@ useEffect(() => {
   );
   return unsubscribe;
 }, []);`}
-              </CodeBlock>
-            </div>
-          </div>
+                </CodeBlock>
+              </div>
+            </>
+          )}
 
-          {/* Shared State */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <h4 className="mb-4 font-mono text-sm font-semibold text-primary flex items-center gap-2">
-              <Share2 className="h-4 w-4" />
-              Shared State (Com Cautela)
-            </h4>
-            <p className="mb-4 text-sm text-muted-foreground">
-              Use apenas para dados realmente globais. Cada MFE deve ter seu
-              próprio estado de negócio.
-            </p>
-            <div className="grid gap-4 md:grid-cols-2">
-              <CodeBlock language="typescript" filename="shared-store.ts">
-                {`// Shell expõe store mínima via Module Federation
-// shell/src/shared-store.ts
+          {selectedPattern === "props" && (
+            <>
+              <h4 className="mb-4 font-mono text-sm font-semibold text-primary flex items-center gap-2">
+                <ArrowLeftRight className="h-4 w-4" />
+                Props/Attributes (Unidirecional)
+              </h4>
+              <p className="mb-4 text-sm text-muted-foreground">
+                Shell passa dados como props para MFEs filhos. Comunicacao simples e
+                previsivel, porem unidirecional.
+              </p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <CodeBlock language="typescript" filename="shell-app.tsx">
+                  {`// Shell: Passa configuração para MFEs
+function AppShell() {
+  const user = useAuth();
+  const flags = useFeatureFlags();
+  
+  return (
+    <div>
+      <MFEHeader 
+        user={user}
+        featureFlags={flags}
+        onLogout={handleLogout}
+      />
+      
+      <MFEContent 
+        locale={user?.locale || 'pt-BR'}
+        theme={theme}
+      />
+    </div>
+  );
+}`}
+                </CodeBlock>
+
+                <CodeBlock language="typescript" filename="mfe-header.tsx">
+                  {`// MFE Header: Recebe props do Shell
+interface HeaderProps {
+  user: User | null;
+  featureFlags: Record<string, boolean>;
+  onLogout: () => void;
+}
+
+function MFEHeader({ user, featureFlags, onLogout }: HeaderProps) {
+  return (
+    <header>
+      {user && <Avatar user={user} />}
+      {featureFlags.newNav && <NewNavigation />}
+      <button onClick={onLogout}>Sair</button>
+    </header>
+  );
+}
+
+// Backend equivalente: Injeção de dependência`}
+                </CodeBlock>
+              </div>
+            </>
+          )}
+
+          {selectedPattern === "state" && (
+            <>
+              <h4 className="mb-4 font-mono text-sm font-semibold text-chart-4 flex items-center gap-2">
+                <Share2 className="h-4 w-4" />
+                Shared State (Com Cautela)
+              </h4>
+              <p className="mb-4 text-sm text-muted-foreground">
+                Use apenas para dados realmente globais. Cada MFE deve ter seu
+                proprio estado de negocio.
+              </p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <CodeBlock language="typescript" filename="shared-store.ts">
+                  {`// Shell expõe store mínima
 import { create } from 'zustand';
 
 interface SharedState {
@@ -317,7 +371,6 @@ interface SharedState {
   locale: string;
   featureFlags: Record<string, boolean>;
   
-  // Actions
   setUser: (user: User | null) => void;
   setTheme: (theme: 'light' | 'dark') => void;
 }
@@ -330,11 +383,10 @@ export const useSharedStore = create<SharedState>((set) => ({
   setUser: (user) => set({ user }),
   setTheme: (theme) => set({ theme }),
 }));`}
-              </CodeBlock>
+                </CodeBlock>
 
-              <CodeBlock language="typescript" filename="mfe-consumption.tsx">
-                {`// MFE consome via Module Federation
-// mfe-profile/src/ProfilePage.tsx
+                <CodeBlock language="typescript" filename="mfe-consumption.tsx">
+                  {`// MFE consome via Module Federation
 import { useSharedStore } from 'shell/shared-store';
 
 function ProfilePage() {
@@ -347,28 +399,90 @@ function ProfilePage() {
   const [formData, setFormData] = useState({});
   
   // NÃO coloque formData no shared store!
-  // Cada MFE gerencia seu próprio estado
   
   if (!user) return <Redirect to="/login" />;
   
   return <ProfileForm user={user} theme={theme} />;
 }`}
-              </CodeBlock>
-            </div>
-          </div>
+                </CodeBlock>
+              </div>
+            </>
+          )}
 
-          {/* BroadcastChannel */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <h4 className="mb-4 font-mono text-sm font-semibold text-chart-4 flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              BroadcastChannel API (Cross-Tab)
-            </h4>
-            <p className="mb-4 text-sm text-muted-foreground">
-              API nativa do browser para comunicação entre tabs/windows da mesma
-              origem. Perfeito para logout global.
-            </p>
-            <CodeBlock language="typescript" filename="broadcast-auth.ts">
-              {`// Sync de autenticação entre tabs
+          {selectedPattern === "url" && (
+            <>
+              <h4 className="mb-4 font-mono text-sm font-semibold text-accent flex items-center gap-2">
+                <Boxes className="h-4 w-4" />
+                URL/Router (Deep Linking)
+              </h4>
+              <p className="mb-4 text-sm text-muted-foreground">
+                Comunicacao via query params e rotas. O Shell gerencia a navegacao
+                e MFEs leem/escrevem na URL.
+              </p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <CodeBlock language="typescript" filename="mfe-filters.tsx">
+                  {`// MFE Catálogo: Filtros via URL
+import { useSearchParams } from 'react-router-dom';
+
+function ProductFilters() {
+  const [params, setParams] = useSearchParams();
+  
+  const category = params.get('category');
+  const minPrice = params.get('minPrice');
+  
+  const handleFilter = (key: string, value: string) => {
+    setParams(prev => {
+      prev.set(key, value);
+      return prev;
+    });
+  };
+  
+  // URL: /products?category=eletronicos&minPrice=100
+  return <Filters onChange={handleFilter} />;
+}`}
+                </CodeBlock>
+
+                <CodeBlock language="typescript" filename="mfe-sidebar.tsx">
+                  {`// MFE Sidebar: Lê filtros da URL
+function Sidebar() {
+  const [params] = useSearchParams();
+  
+  // Reage a mudanças na URL
+  const activeCategory = params.get('category');
+  
+  return (
+    <nav>
+      {categories.map(cat => (
+        <Link 
+          key={cat.id}
+          to={\`?category=\${cat.id}\`}
+          className={activeCategory === cat.id ? 'active' : ''}
+        >
+          {cat.name}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+// URL é a "single source of truth"`}
+                </CodeBlock>
+              </div>
+            </>
+          )}
+
+          {selectedPattern === "broadcast" && (
+            <>
+              <h4 className="mb-4 font-mono text-sm font-semibold text-chart-4 flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                BroadcastChannel API (Cross-Tab)
+              </h4>
+              <p className="mb-4 text-sm text-muted-foreground">
+                API nativa do browser para comunicacao entre tabs/windows da mesma
+                origem. Perfeito para logout global.
+              </p>
+              <CodeBlock language="typescript" filename="broadcast-auth.ts">
+                {`// Sync de autenticação entre tabs
 const authChannel = new BroadcastChannel('auth');
 
 // Tab 1: Usuário faz logout
@@ -393,8 +507,9 @@ authChannel.onmessage = (event) => {
 useEffect(() => {
   return () => authChannel.close();
 }, []);`}
-            </CodeBlock>
-          </div>
+              </CodeBlock>
+            </>
+          )}
         </div>
       </div>
 
