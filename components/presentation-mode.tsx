@@ -23,14 +23,23 @@ export function PresentationMode({ slides, onClose, initialSlideId }: Presentati
     return index !== -1 ? index : 0
   })
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const contentRef = React.useRef<HTMLDivElement>(null)
+
+  const scrollToTop = useCallback(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTo({ top: 0, behavior: "smooth" })
+    }
+  }, [])
 
   const nextSlide = useCallback(() => {
     setCurrentSlideIndex((prev) => (prev + 1) % slides.length)
-  }, [slides.length])
+    scrollToTop()
+  }, [slides.length, scrollToTop])
 
   const prevSlide = useCallback(() => {
     setCurrentSlideIndex((prev) => (prev - 1 + slides.length) % slides.length)
-  }, [slides.length])
+    scrollToTop()
+  }, [slides.length, scrollToTop])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -69,7 +78,7 @@ export function PresentationMode({ slides, onClose, initialSlideId }: Presentati
       </div>
 
       {/* Slide Content */}
-      <div className="flex-1 overflow-auto p-4 sm:p-8 md:p-12 lg:p-16 flex flex-col items-center">
+      <div ref={contentRef} className="flex-1 overflow-auto p-4 sm:p-8 md:p-12 lg:p-16 flex flex-col items-center">
         <div className="w-full max-w-5xl">
           <AnimatePresence mode="wait">
             <motion.div
@@ -100,7 +109,10 @@ export function PresentationMode({ slides, onClose, initialSlideId }: Presentati
           {slides.map((_, i) => (
             <button
               key={i}
-              onClick={() => setCurrentSlideIndex(i)}
+              onClick={() => {
+                setCurrentSlideIndex(i)
+                scrollToTop()
+              }}
               className={cn(
                 "h-2 w-2 rounded-full transition-all",
                 i === currentSlideIndex ? "w-6 bg-primary" : "bg-muted hover:bg-muted-foreground"

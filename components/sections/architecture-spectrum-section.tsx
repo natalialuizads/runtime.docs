@@ -4,15 +4,21 @@ import { DynamicDiagram } from "@/components/dynamic-diagram";
 import { cn } from "@/lib/utils";
 import {
   Activity,
+  AlertTriangle,
   Box,
+  CheckCircle2,
+  Code2,
   Database,
   Globe,
   Layers,
+  LayoutTemplate,
   Server,
   Smartphone,
+  XCircle,
 } from "lucide-react";
 import React, { useState } from "react";
 
+// --- TIPOS ---
 type ArchitectureType = "spa" | "ssg" | "ssr" | "webview";
 
 interface ArchitectureData {
@@ -22,10 +28,13 @@ interface ArchitectureData {
   icon: React.ElementType;
   example: string;
   color: string;
-  serverLoad: number;
-  infraComplexity: number;
-  seo: number;
-  latency: number;
+  // Métricas (0-100)
+  metrics: {
+    serverLoad: number;
+    infraComplexity: number;
+    seo: number;
+    latency: number; // Invertido: quanto maior, melhor (menos latência)
+  };
   description: string;
   diagram: {
     nodes: Array<{
@@ -45,236 +54,152 @@ interface ArchitectureData {
   };
   prosBackend: string[];
   consBackend: string[];
+  whenToAvoid: string;
 }
 
+// --- DADOS ---
 const architectures: ArchitectureData[] = [
   {
     id: "spa",
     name: "SPA (Single Page Application)",
     backendAnalogy: "API Stateless + CDN",
     icon: Globe,
-    example: "Gmail, Figma, Notion",
-    color: "primary",
-    serverLoad: 20,
-    infraComplexity: 30,
-    seo: 25,
-    latency: 70,
+    example: "Gmail, Figma, Dashboards",
+    color: "blue-500",
+    metrics: { serverLoad: 20, infraComplexity: 30, seo: 30, latency: 60 },
     description:
-      "O servidor entrega apenas arquivos estáticos (HTML/JS/CSS). Toda a lógica roda no cliente. É como uma API REST pura: stateless, escalável horizontalmente via CDN.",
+      "O servidor é 'burro', apenas entrega arquivos estáticos e JSON. O navegador se torna o computador que roda a aplicação. Toda a lógica de renderização e roteamento acontece no cliente.",
     diagram: {
       nodes: [
-        { id: "user", label: "Usuário", icon: Activity, x: 10, y: 50 },
-        { id: "browser", label: "Browser", icon: Smartphone, x: 30, y: 50 },
-        {
-          id: "cdn",
-          label: "CDN (Cached)",
-          icon: Globe,
-          x: 50,
-          y: 30,
-          color: "border-primary",
-        },
-        { id: "files", label: "Static Files", icon: Box, x: 50, y: 70 },
-        {
-          id: "api",
-          label: "REST API",
-          icon: Server,
-          x: 70,
-          y: 50,
-          color: "border-chart-4",
-        },
-        { id: "db", label: "Database", icon: Database, x: 90, y: 50 },
+        { id: "user", label: "User", icon: Activity, x: 10, y: 50 },
+        { id: "browser", label: "Browser (React)", icon: Smartphone, x: 35, y: 50, color: "border-blue-500" },
+        { id: "cdn", label: "CDN (Assets)", icon: Box, x: 60, y: 20 },
+        { id: "api", label: "API REST/GraphQL", icon: Server, x: 85, y: 50 },
       ],
       edges: [
-        { from: "user", to: "browser", label: "Click" },
-        {
-          from: "browser",
-          to: "cdn",
-          animated: true,
-          label: "1. GET index.html",
-        },
-        { from: "cdn", to: "files", animated: true, label: "Cache hit" },
-        {
-          from: "browser",
-          to: "api",
-          animated: true,
-          label: "2. JS fetch /api",
-        },
-        { from: "api", to: "db", animated: true, label: "Query" },
+        { from: "user", to: "browser", label: "Acessa" },
+        { from: "browser", to: "cdn", animated: true, label: "1. Load JS bundle" },
+        { from: "browser", to: "api", animated: true, label: "2. Fetch JSON" },
+        { from: "browser", to: "browser", label: "3. Renderiza na tela" },
       ],
     },
     prosBackend: [
-      "Servidor não processa HTML (zero CPU para render)",
-      "Cache agressivo na CDN (TTL infinito para assets)",
-      "Horizontal scaling trivial (so API)",
+      "Servidor foca apenas em dados (JSON)",
+      "CDN absorve todo o tráfego de assets",
+      "Estado da sessão mantido no cliente",
     ],
     consBackend: [
-      "SEO depende de JavaScript (Googlebot precisa executar)",
-      "Tempo para First Paint alto (download + parse + execute)",
-      "Não funciona sem JavaScript habilitado",
+      "SEO ruim (crawlers veem página em branco inicialmente)",
+      "Carregamento inicial lento (download do JS)",
     ],
+    whenToAvoid: "Blogs, E-commerce público, Sites de notícias (onde SEO é vital).",
   },
   {
     id: "ssg",
     name: "SSG (Static Site Generation)",
-    backendAnalogy: "Build-time Rendering (Netlify, Vercel)",
+    backendAnalogy: "Cache Pré-Aquecido (Build Time)",
     icon: Layers,
-    example: "Nextjs docs, Gatsby blogs, Static sites",
-    color: "chart-2",
-    serverLoad: 5,
-    infraComplexity: 40,
-    seo: 100,
-    latency: 20,
+    example: "Docs, Blogs, Landing Pages",
+    color: "green-500",
+    metrics: { serverLoad: 5, infraComplexity: 40, seo: 100, latency: 95 },
     description:
-      "HTML pré-gerado em build-time e servido via CDN. Combina performance de static files com SEO perfeito. Ideal para conteúdo que não muda frequentemente. É como um 'cache pré-aquecido' permanente.",
+      "O HTML é gerado no momento do Deploy (Build). Quando o usuário acessa, o arquivo já existe fisicamente na CDN. É a arquitetura mais rápida possível, pois não há banco de dados na leitura.",
     diagram: {
       nodes: [
-        {
-          id: "build",
-          label: "Build Server",
-          icon: Server,
-          x: 15,
-          y: 50,
-          color: "border-chart-2",
-        },
-        { id: "static", label: "Pre-built HTML", icon: Box, x: 45, y: 50 },
-        {
-          id: "cdn",
-          label: "CDN Global",
-          icon: Globe,
-          x: 75,
-          y: 30,
-          color: "border-chart-2",
-        },
-        { id: "user", label: "Usuário", icon: Activity, x: 75, y: 70 },
+        { id: "dev", label: "Build Process", icon: Code2, x: 10, y: 50 },
+        { id: "api", label: "Headless CMS", icon: Database, x: 10, y: 80 },
+        { id: "html", label: "HTML Files", icon: Box, x: 35, y: 50, color: "border-green-500" },
+        { id: "cdn", label: "CDN Edge", icon: Globe, x: 60, y: 50 },
+        { id: "user", label: "User", icon: Activity, x: 85, y: 50 },
       ],
       edges: [
-        { from: "build", to: "static", animated: true, label: "npm run build" },
-        { from: "static", to: "cdn", animated: true, label: "Deploy" },
-        { from: "user", to: "cdn", animated: true, label: "<10ms" },
+        { from: "api", to: "dev", label: "Busca dados" },
+        { from: "dev", to: "html", animated: true, label: "Gera HTML" },
+        { from: "html", to: "cdn", label: "Deploy" },
+        { from: "user", to: "cdn", animated: true, label: "Request (Cache Hit)" },
       ],
     },
     prosBackend: [
-      "Latência mínima (apenas file serving)",
-      "Zero server CPU (conteúdo pré-renderizado)",
-      "SEO perfeito (HTML estático + sem JS)",
-      "Hosting barato (qualquer CDN + S3)",
+      "Zero processamento no request (apenas I/O)",
+      "Impossível derrubar o banco com picos de acesso",
+      "Segurança máxima (apenas arquivos estáticos)",
     ],
     consBackend: [
-      "Build-time alto (gera 10k+ páginas = 10 minutos)",
-      "Conteúdo estático (impossível dynamic routing)",
-      "ISR (Incremental Static Regeneration) é complexo",
+      "Tempo de build cresce com número de páginas",
+      "Conteúdo 'real-time' é difícil",
     ],
+    whenToAvoid: "Redes sociais, Dashboards dinâmicos, Sites com milhões de páginas.",
   },
   {
     id: "ssr",
     name: "SSR (Server-Side Rendering)",
-    backendAnalogy: "PHP/JSP Moderno (Node.js)",
+    backendAnalogy: "PHP/JSP Moderno",
     icon: Server,
-    example: "Amazon, Vercel, NY Times",
-    color: "accent",
-    serverLoad: 80,
-    infraComplexity: 60,
-    seo: 95,
-    latency: 40,
+    example: "E-commerce, Portais de Notícia",
+    color: "purple-500",
+    metrics: { serverLoad: 90, infraComplexity: 70, seo: 100, latency: 50 },
     description:
-      "O servidor renderiza HTML completo a cada request. É o modelo clássico (PHP, JSP, Rails) mas com Node.js. Pense como um endpoint que retorna text/html em vez de application/json.",
+      "A página é montada no servidor a cada requisição. O servidor busca os dados, renderiza o HTML e envia pronto para o navegador. Ideal para conteúdo dinâmico que precisa de SEO.",
     diagram: {
       nodes: [
-        { id: "user", label: "Usuário", icon: Activity, x: 10, y: 50 },
-        { id: "browser", label: "Browser", icon: Smartphone, x: 30, y: 50 },
-        {
-          id: "node",
-          label: "Node.js Server",
-          icon: Server,
-          x: 60,
-          y: 50,
-          color: "border-accent",
-        },
-        { id: "render", label: "React Render", icon: Layers, x: 60, y: 20 },
-        { id: "db", label: "Database", icon: Database, x: 90, y: 50 },
+        { id: "user", label: "User", icon: Activity, x: 10, y: 50 },
+        { id: "server", label: "Node.js Server", icon: Server, x: 40, y: 50, color: "border-purple-500" },
+        { id: "db", label: "Database", icon: Database, x: 70, y: 20 },
+        { id: "api", label: "Microservices", icon: Layers, x: 70, y: 80 },
       ],
       edges: [
-        { from: "user", to: "browser", label: "Click" },
-        { from: "browser", to: "node", animated: true, label: "GET /page" },
-        {
-          from: "node",
-          to: "render",
-          animated: true,
-          label: "getServerSideProps()",
-        },
-        { from: "render", to: "db", animated: true, label: "Query" },
-        {
-          from: "node",
-          to: "browser",
-          animated: true,
-          label: "3. HTML completo",
-        },
+        { from: "user", to: "server", label: "Request" },
+        { from: "server", to: "db", animated: true, label: "1. Query" },
+        { from: "server", to: "api", animated: true, label: "2. Fetch" },
+        { from: "server", to: "server", label: "3. Render HTML" },
+        { from: "server", to: "user", animated: true, label: "4. Response HTML" },
       ],
     },
     prosBackend: [
-      "SEO perfeito (HTML completo na resposta)",
-      "First Paint rapido (HTML ja renderizado)",
-      "Funciona sem JavaScript (graceful degradation)",
+      "SEO Perfeito com dados dinâmicos",
+      "Dados sempre frescos (sem cache staleness)",
+      "Rede interna do datacenter é rápida para buscar dados",
     ],
     consBackend: [
-      "Cada request consome CPU do servidor",
-      "Scaling mais caro (precisa de mais pods)",
-      "TTFB aumenta com complexidade da pagina",
+      "Alto custo de computação (CPU)",
+      "TTFB (Time to First Byte) mais lento",
+      "Difícil de escalar cache",
     ],
+    whenToAvoid: "Apps que não precisam de SEO, Páginas estáticas simples.",
   },
   {
     id: "webview",
     name: "WebView (Híbrido)",
-    backendAnalogy: "Docker Container do Browser",
+    backendAnalogy: "Docker Container no Celular",
     icon: Smartphone,
-    example: "Nubank, Uber, Spotify (partes)",
-    color: "chart-3",
-    serverLoad: 30,
-    infraComplexity: 70,
-    seo: 0,
-    latency: 50,
+    example: "Apps Bancários, Uber (telas de help)",
+    color: "orange-500",
+    metrics: { serverLoad: 30, infraComplexity: 60, seo: 0, latency: 40 },
     description:
-      "Um container isolado do browser rodando dentro do app nativo. É literalmente um 'Docker do Chrome' embedded. O app nativo é o host, a WebView é o container.",
+      "Um navegador embutido dentro de um app nativo. Permite reutilizar telas da Web dentro do iOS/Android, com uma ponte de comunicação (Bridge) para acessar recursos nativos.",
     diagram: {
       nodes: [
-        { id: "user", label: "Usuário", icon: Activity, x: 10, y: 50 },
-        {
-          id: "native",
-          label: "Native App",
-          icon: Smartphone,
-          x: 35,
-          y: 50,
-          color: "border-chart-3",
-        },
-        { id: "wv", label: "WebView", icon: Box, x: 60, y: 50 },
-        {
-          id: "bridge",
-          label: "Bridge JS/Native",
-          icon: Layers,
-          x: 60,
-          y: 20,
-          color: "border-chart-3",
-        },
-        { id: "api", label: "API", icon: Server, x: 85, y: 50 },
+        { id: "user", label: "User", icon: Activity, x: 10, y: 50 },
+        { id: "app", label: "App Nativo (Swift/Kotlin)", icon: Smartphone, x: 35, y: 50, color: "border-orange-500" },
+        { id: "bridge", label: "JS Bridge", icon: Layers, x: 60, y: 50 },
+        { id: "web", label: "Web Page", icon: Globe, x: 85, y: 50 },
       ],
       edges: [
-        { from: "user", to: "native", label: "Toca app" },
-        { from: "native", to: "wv", animated: true, label: "Carrega HTML/JS" },
-        { from: "wv", to: "bridge", animated: true, label: "window.webkit" },
-        { from: "bridge", to: "native", animated: true, label: "postMessage" },
-        { from: "native", to: "api", animated: true, label: "Native request" },
+        { from: "user", to: "app", label: "Abre Tela" },
+        { from: "app", to: "bridge", animated: true, label: "Injeta Contexto" },
+        { from: "web", to: "bridge", animated: true, label: "window.postMessage" },
+        { from: "bridge", to: "app", animated: true, label: "Chama Função Nativa" },
       ],
     },
     prosBackend: [
-      "Reutiliza codigo web no mobile",
-      "Deploy sem App Store (atualizacao OTA)",
-      "Um time pode manter web + mobile",
+      "Atualização OTA (Over The Air) sem App Store",
+      "Mesmo código para Web, iOS e Android",
     ],
     consBackend: [
-      "Performance limitada pelo WebView engine",
-      "Bridge nativo-web adiciona latencia",
-      "Debug mais complexo (dois runtimes)",
+      "Performance inferior ao nativo",
+      "UX pode parecer 'estranha' (scroll, inputs)",
     ],
+    whenToAvoid: "Jogos, Animações pesadas, Funcionalidades core do dispositivo.",
   },
 ];
 
@@ -284,266 +209,204 @@ export function ArchitectureSpectrumSection() {
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-16">
-      <div className="mb-8">
-        <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2">
-          <span className="font-mono text-xs text-primary">ARQUITETURAS</span>
+      <div className="mb-10 text-center md:text-left">
+        <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 mb-4">
+          <LayoutTemplate className="h-4 w-4 text-primary" />
+          <span className="font-mono text-xs font-bold text-primary">ARQUITETURA FRONTEND</span>
         </div>
-        <h2 className="mt-4 text-2xl font-bold text-foreground md:text-3xl">
-          O Espectro das Arquiteturas Frontend
+        <h2 className="text-3xl font-bold text-foreground md:text-4xl">
+          Como os dados chegam na tela?
         </h2>
-        <p className="mt-2 text-muted-foreground">
-          Cada arquitetura é um trade-off. Assim como você escolhe entre SQL e
-          NoSQL, aqui você escolhe onde o rendering acontece.
+        <p className="mt-3 text-lg text-muted-foreground max-w-2xl">
+          Escolher a arquitetura errada pode custar caro em infraestrutura ou matar seu SEO.
+          Entenda as diferenças usando analogias de Backend.
         </p>
       </div>
 
-      {/* Architecture Selector */}
-      <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
+      {/* Seletor de Arquitetura */}
+      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
         {architectures.map((arch) => {
           const Icon = arch.icon;
+          const isSelected = selected === arch.id;
           return (
             <button
               key={arch.id}
               onClick={() => setSelected(arch.id)}
               className={cn(
-                "group relative flex flex-col items-center gap-2 rounded-lg border p-4 transition-all",
-                selected === arch.id
-                  ? `border-${arch.color}/50 bg-${arch.color}/10`
-                  : "border-border bg-card hover:border-border/80 hover:bg-secondary/50",
+                "group relative flex flex-col items-center justify-center gap-3 rounded-xl border p-6 transition-all duration-300",
+                isSelected
+                  ? `border-${arch.color} bg-${arch.color}/5 shadow-lg scale-[1.02]`
+                  : "border-border bg-card hover:border-foreground/20 hover:bg-secondary/50",
               )}
             >
-              <Icon
-                className={cn(
-                  "h-8 w-8 transition-colors",
-                  selected === arch.id
-                    ? `text-${arch.color}`
-                    : "text-muted-foreground",
+              <div className={cn(
+                "p-3 rounded-full transition-colors",
+                 isSelected ? `bg-${arch.color}/20 text-${arch.color}` : "bg-muted text-muted-foreground"
+              )}>
+                 <Icon className="h-6 w-6" />
+              </div>
+              
+              <div className="text-center">
+                <span className={cn(
+                  "block font-bold text-sm",
+                  isSelected ? "text-foreground" : "text-muted-foreground"
+                )}>
+                  {arch.id.toUpperCase()}
+                </span>
+                {isSelected && (
+                    <span className="text-[10px] text-muted-foreground font-mono mt-1 opacity-80 hidden md:block">
+                        {arch.backendAnalogy.split(' ')[0]}...
+                    </span>
                 )}
-              />
-              <span
-                className={cn(
-                  "text-center font-mono text-xs",
-                  selected === arch.id
-                    ? "text-foreground"
-                    : "text-muted-foreground",
-                )}
-              >
-                {arch.id.toUpperCase()}
-              </span>
-              {selected === arch.id && (
-                <div
-                  className={cn(
-                    "absolute -bottom-px left-1/2 h-0.5 w-12 -translate-x-1/2",
-                    `bg-${arch.color}`,
-                  )}
-                />
-              )}
+              </div>
             </button>
           );
         })}
       </div>
 
-      {/* Selected Architecture Detail */}
-      <div className="rounded-xl border border-border bg-card p-6">
-        <div className="mb-6 flex items-start justify-between">
-          <div>
-            <h3 className="text-xl font-bold text-foreground">
-              {current.name}
-            </h3>
-            <p className="mt-1 font-mono text-sm text-primary">
-              Analogia Backend: {current.backendAnalogy}
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Exemplos: {current.example}
-            </p>
-          </div>
+      {/* Painel Principal */}
+      <div className="grid lg:grid-cols-3 gap-8">
+        
+        {/* Coluna da Esquerda: Detalhes e Métricas */}
+        <div className="lg:col-span-1 space-y-6">
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm h-full">
+                <h3 className="text-2xl font-bold text-foreground mb-1">
+                    {current.name.split('(')[0]}
+                </h3>
+                <p className="text-sm font-medium text-muted-foreground mb-4">
+                    {current.name.split('(')[1]?.replace(')', '')}
+                </p>
+
+                <div className="bg-muted/50 rounded-lg p-3 mb-6 border border-border/50">
+                    <span className="text-xs font-mono uppercase text-muted-foreground block mb-1">Analogia para Backend</span>
+                    <span className={`text-sm font-bold text-${current.color} flex items-center gap-2`}>
+                        <Server className="h-3 w-3" />
+                        {current.backendAnalogy}
+                    </span>
+                </div>
+
+                <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+                    {current.description}
+                </p>
+                
+                <div className="space-y-4">
+                    <MetricBar label="Custo Servidor" value={current.metrics.serverLoad} color="destructive" tooltip="CPU/Memória consumida por request" />
+                    <MetricBar label="SEO" value={current.metrics.seo} color="blue-500" tooltip="Facilidade de indexação pelo Google" />
+                    <MetricBar label="Performance (TTFB)" value={current.metrics.latency} color="green-500" tooltip="Tempo até o primeiro byte" />
+                </div>
+            </div>
         </div>
 
-        <p className="mb-6 text-foreground/90">{current.description}</p>
+        {/* Coluna da Direita: Diagrama Interativo */}
+        <div className="lg:col-span-2">
+            <div className="rounded-xl border border-border bg-card shadow-sm h-full flex flex-col overflow-hidden">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/20">
+                    <div className="flex items-center gap-2">
+                        <Activity className="h-4 w-4 text-primary" />
+                        <span className="font-bold text-sm">Fluxo de Requisição</span>
+                    </div>
+                    <span className={`text-xs font-mono px-2 py-0.5 rounded bg-${current.color}/10 text-${current.color}`}>
+                        {current.id.toUpperCase()}
+                    </span>
+                </div>
 
-        <DynamicDiagram
-          title="Fluxo de Request"
-          nodes={current.diagram.nodes}
-          edges={current.diagram.edges}
-        />
-
-        {/* Metrics */}
-        <div className="mt-6 grid gap-4 md:grid-cols-4">
-          <MetricBar
-            label="Carga no Servidor"
-            value={current.serverLoad}
-            color="destructive"
-          />
-          <MetricBar
-            label="Complexidade Infra"
-            value={current.infraComplexity}
-            color="chart-4"
-          />
-          <MetricBar label="SEO Score" value={current.seo} color="accent" />
-          <MetricBar
-            label="Latencia (invertido)"
-            value={100 - current.latency}
-            color="primary"
-            invertedLabel="Menor = Melhor"
-          />
-        </div>
-
-        {/* Pros and Cons */}
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <div className="rounded-lg border border-accent/30 bg-accent/5 p-4">
-            <h4 className="mb-3 font-mono text-sm font-semibold text-accent">
-              Vantagens (Backend View)
-            </h4>
-            <ul className="space-y-2">
-              {current.prosBackend.map((pro, i) => (
-                <li
-                  key={i}
-                  className="flex items-start gap-2 text-sm text-foreground/80"
-                >
-                  <span className="mt-1 text-accent">+</span>
-                  {pro}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
-            <h4 className="mb-3 font-mono text-sm font-semibold text-destructive">
-              Desvantagens (Backend View)
-            </h4>
-            <ul className="space-y-2">
-              {current.consBackend.map((con, i) => (
-                <li
-                  key={i}
-                  className="flex items-start gap-2 text-sm text-foreground/80"
-                >
-                  <span className="mt-1 text-destructive">-</span>
-                  {con}
-                </li>
-              ))}
-            </ul>
-          </div>
+                <div className="p-6 flex-1 bg-background/50 min-h-[400px] flex flex-col justify-center">
+                     <div className="animate-in fade-in zoom-in-95 duration-300">
+                         <DynamicDiagram
+                            title={`Processo: ${current.name}`}
+                            nodes={current.diagram.nodes}
+                            edges={current.diagram.edges}
+                        />
+                        <div className="mt-8 flex justify-center gap-6 text-xs text-muted-foreground border-t border-border/50 pt-4">
+                            <div className="flex items-center gap-1.5">
+                                <div className="w-2 h-2 rounded-full bg-border" /> Request
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" /> Processamento Principal
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
       </div>
 
-      {/* Decision Matrix */}
-      <div className="mt-8 overflow-x-auto">
-        <h3 className="mb-4 font-mono text-lg font-semibold text-foreground">
-          Matriz de Decisão (Backend Perspective)
-        </h3>
-        <table className="w-full border-collapse font-mono text-sm">
-          <thead>
-            <tr className="border-b border-border">
-              <th className="p-3 text-left text-muted-foreground">
-                Arquitetura
-              </th>
-              <th className="p-3 text-center text-muted-foreground">
-                Server CPU
-              </th>
-              <th className="p-3 text-center text-muted-foreground">Infra</th>
-              <th className="p-3 text-center text-muted-foreground">SEO</th>
-              <th className="p-3 text-center text-muted-foreground">Latency</th>
-              <th className="p-3 text-left text-muted-foreground">Use Case</th>
-            </tr>
-          </thead>
-          <tbody>
-            {architectures.map((arch) => (
-              <tr
-                key={arch.id}
-                className={cn(
-                  "border-b border-border/50 transition-colors cursor-pointer",
-                  selected === arch.id
-                    ? "bg-secondary/50"
-                    : "hover:bg-secondary/30",
-                )}
-                onClick={() => setSelected(arch.id)}
-              >
-                <td className="p-3 font-semibold text-foreground">
-                  {arch.id.toUpperCase()}
-                </td>
-                <td className="p-3 text-center">
-                  <ScoreIndicator value={arch.serverLoad} inverted />
-                </td>
-                <td className="p-3 text-center">
-                  <ScoreIndicator value={arch.infraComplexity} inverted />
-                </td>
-                <td className="p-3 text-center">
-                  <ScoreIndicator value={arch.seo} />
-                </td>
-                <td className="p-3 text-center">
-                  <ScoreIndicator value={100 - arch.latency} />
-                </td>
-                <td className="p-3 text-muted-foreground">
-                  {arch.example.split(",")[0]}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Seção de Análise (Trade-offs e Alertas) */}
+      <div className="mt-8 grid md:grid-cols-3 gap-6">
+         {/* Pros */}
+         <div className="space-y-3">
+             <h4 className="text-xs font-mono font-bold text-muted-foreground uppercase flex items-center gap-2">
+                 <CheckCircle2 className="h-4 w-4 text-green-500" />
+                 Por que escolher (Pros)
+             </h4>
+             <ul className="grid gap-2 h-full">
+                 {current.prosBackend.map((pro, i) => (
+                     <li key={i} className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card/50 text-sm">
+                         <span className="text-green-500 font-bold mt-0.5">+</span>
+                         {pro}
+                     </li>
+                 ))}
+             </ul>
+         </div>
+
+         {/* Cons */}
+         <div className="space-y-3">
+             <h4 className="text-xs font-mono font-bold text-muted-foreground uppercase flex items-center gap-2">
+                 <XCircle className="h-4 w-4 text-destructive" />
+                 Onde dói (Cons)
+             </h4>
+             <ul className="grid gap-2 h-full">
+                 {current.consBackend.map((con, i) => (
+                     <li key={i} className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card/50 text-sm">
+                         <span className="text-destructive font-bold mt-0.5">-</span>
+                         {con}
+                     </li>
+                 ))}
+             </ul>
+         </div>
+
+         {/* When to Avoid */}
+         <div className="space-y-3">
+             <h4 className="text-xs font-mono font-bold text-muted-foreground uppercase flex items-center gap-2">
+                 <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                 Quando EVITAR
+             </h4>
+             <div className="p-4 rounded-lg border border-yellow-500/20 bg-yellow-500/5 h-full flex flex-col justify-center">
+                <p className="text-sm text-foreground/80 leading-relaxed font-medium">
+                    {current.whenToAvoid}
+                </p>
+             </div>
+         </div>
       </div>
     </section>
   );
 }
 
+// --- SUBCOMPONENTES ---
+
 function MetricBar({
   label,
   value,
   color,
-  invertedLabel,
+  tooltip,
 }: {
   label: string;
   value: number;
   color: string;
-  invertedLabel?: string;
+  tooltip: string;
 }) {
   return (
-    <div>
-      <div className="mb-1 flex justify-between text-xs">
-        <span className="text-muted-foreground">{label}</span>
-        <span className="font-mono text-foreground">{value}%</span>
+    <div className="group relative">
+      <div className="mb-1.5 flex justify-between items-end">
+        <span className="text-xs font-medium text-muted-foreground">{label}</span>
+        <span className="text-xs font-mono font-bold text-foreground">{value}%</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-secondary">
+      <div className="h-2.5 overflow-hidden rounded-full bg-secondary border border-border/50">
         <div
-          className={cn("h-full transition-all duration-500", `bg-${color}`)}
+          className={cn("h-full rounded-full transition-all duration-1000 ease-out", `bg-${color}`)}
           style={{ width: `${value}%` }}
         />
       </div>
-      {invertedLabel && (
-        <p className="mt-1 text-xs text-muted-foreground/60">{invertedLabel}</p>
-      )}
     </div>
-  );
-}
-
-function ScoreIndicator({
-  value,
-  inverted = false,
-}: {
-  value: number;
-  inverted?: boolean;
-}) {
-  const getColor = () => {
-    const score = inverted ? 100 - value : value;
-    if (score >= 70) return "text-accent";
-    if (score >= 40) return "text-chart-4";
-    return "text-destructive";
-  };
-
-  const getLabel = () => {
-    const score = inverted ? 100 - value : value;
-    if (score >= 70) return "Otimo";
-    if (score >= 40) return "Medio";
-    return "Alto";
-  };
-
-  return (
-    <span className={cn("text-xs", getColor())}>
-      {inverted
-        ? value <= 30
-          ? "Baixo"
-          : value <= 60
-            ? "Medio"
-            : "Alto"
-        : getLabel()}
-    </span>
   );
 }
