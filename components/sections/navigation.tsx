@@ -64,45 +64,9 @@ export function Navigation({
                 runtime.docs
               </span>
             </div>
-
-            <div className="h-6 w-px bg-border shrink-0" />
-
-            <div className="flex gap-1">
-              {sections.map((section) => {
-                const Icon = section.icon;
-                return (
-                  <button
-                    key={section.id}
-                    onClick={() => onSectionChange(section.id)}
-                    className={cn(
-                      "flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 font-mono text-xs transition-colors",
-                      activeSection === section.id
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-secondary hover:text-foreground",
-                    )}
-                  >
-                    <Icon className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{section.label}</span>
-                  </button>
-                );
-              })}
-            </div>
           </div>
 
           <div className="flex items-center gap-2 ml-4">
-            {mounted && (
-              <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background/50 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                aria-label="Toggle theme"
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-4 w-4" />
-                ) : (
-                  <Moon className="h-4 w-4" />
-                )}
-              </button>
-            )}
           </div>
         </div>
       </div>

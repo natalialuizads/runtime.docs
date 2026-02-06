@@ -51,27 +51,27 @@ export default function BrowserRuntimeDocs() {
     },
     {
       id: "event-loop",
-      title: "The Event Loop",
+      title: "Single Thread & Event Loop",
       content: <EventLoopSection />,
     },
     {
       id: "bundle",
-      title: "The Cost of JavaScript",
+      title: "O Custo do Bundle",
       content: <BundleSection />,
     },
     {
       id: "challenge-1",
-      title: "Debug Challenge #1",
+      title: "Laboratório de Performance & Estado",
       content: <ChallengeOneSection />,
     },
     {
       id: "arch-spectrum",
-      title: "Architecture Spectrum",
+      title: "ARQUITETURA FRONTEND",
       content: <ArchitectureSpectrumSection />,
     },
     {
       id: "mfe-deep-dive",
-      title: "MFE Deep Dive",
+      title: "Microfrontend: A Fundo",
       content: <MFEDeepDiveSection />,
     },
     {
@@ -81,27 +81,27 @@ export default function BrowserRuntimeDocs() {
     },
     {
       id: "auth",
-      title: "Autenticação",
+      title: "Microfrontend: Autenticação",
       content: <AuthSection />,
     },
     {
       id: "mfe-integration",
-      title: "Integration Runtime",
+      title: "Microfrontend: Integração",
       content: <MFEIntegrationSection />,
     },
     {
       id: "composition-strategies",
-      title: "Composition Strategies",
+      title: "Microfrontend: Estratégias de Composição",
       content: <CompositionStrategiesSection />,
     },
     {
       id: "mfe-patterns",
-      title: "Padrões de Arquitetura",
+      title: "Microfrontend: Estratégia de Decomposição",
       content: <MFEPatternsSection />,
     },
     {
       id: "mfe-intro",
-      title: "MFE não é Microserviço",
+      title: "Microfrontend: Quebra de Paradigma",
       content: <MFEIntroSection />,
     },
     {
@@ -111,7 +111,7 @@ export default function BrowserRuntimeDocs() {
     },
     {
       id: "challenge-2",
-      title: "Debug Challenge #2",
+      title: "Vazamento de Estilo e Observabilidade",
       content: <ChallengeTwoSection />,
     },
   ];
@@ -226,6 +226,12 @@ export default function BrowserRuntimeDocs() {
           <MFEDeepDiveSection />
         </div>
 
+        <div className="border-t-4 border-primary/30 bg-gradient-to-b from-primary/5 to-transparent">
+          <div ref={sectionRefs["mfe-integration"]}>
+            <MFEIntegrationSection />
+          </div>
+        </div>
+
         {/* Comunicação entre MFEs */}
         <div
           className="border-t border-border/50 bg-gradient-to-b from-accent/5 to-transparent"
@@ -241,10 +247,6 @@ export default function BrowserRuntimeDocs() {
 
         {/* FASE 2: Padrões e Estratégias */}
         <div className="border-t-4 border-primary/30 bg-gradient-to-b from-primary/5 to-transparent">
-          <div ref={sectionRefs["mfe-integration"]}>
-            <MFEIntegrationSection />
-          </div>
-
           <div
             className="border-t border-border/50"
             ref={sectionRefs["composition-strategies"]}

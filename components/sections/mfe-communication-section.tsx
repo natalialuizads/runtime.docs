@@ -308,65 +308,6 @@ export function MFECommunicationSection() {
         </div>
       </div>
 
-      {/* ANTI-PATTERNS (GUIA DE SOBREVIVÊNCIA) */}
-      <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-8">
-        <div className="flex items-center gap-3 mb-8">
-          <ShieldAlert className="h-8 w-8 text-destructive" />
-          <div>
-            <h3 className="text-xl font-bold text-destructive uppercase tracking-tight">
-              Guia de Sobrevivência MFE
-            </h3>
-            <p className="text-sm text-destructive/70">
-              O que evitar para não criar um monólito distribuído.
-            </p>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          {[
-            {
-              title: "Manipulação Direta do DOM",
-              desc: "MFE A tentando alterar uma div ou estilo do MFE B via JavaScript.",
-              impact: "Quebras de UI impossíveis de debugar.",
-              fix: "Use Eventos Nomeados para pedir que o outro MFE mude.",
-            },
-            {
-              title: "Dependência de Ordem",
-              desc: "MFE B só funciona se o MFE A carregar primeiro.",
-              impact: "Race conditions e erros de runtime intermitentes.",
-              fix: "Trate cada MFE como stateless até que o dado chegue.",
-            },
-            {
-              title: "Store Global Obesa",
-              desc: "Colocar todo o estado da aplicação em uma única store compartilhada.",
-              impact:
-                "Acoplamento total. Deploy de um MFE quebra todos os outros.",
-              fix: "Compartilhe apenas Sessão e Auth. O resto é local do MFE.",
-            },
-            {
-              title: "Hard-coding de URLs",
-              desc: "Um MFE saber exatamente qual a rota interna de outro.",
-              fix: "O App Shell deve centralizar o Mapa de Rotas.",
-            },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className="bg-background rounded-xl p-5 border border-destructive/10"
-            >
-              <h5 className="font-bold text-sm text-destructive mb-2 uppercase tracking-wide">
-                {item.title}
-              </h5>
-              <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                {item.desc}
-              </p>
-              <div className="text-[10px] font-bold text-accent bg-accent/5 px-2 py-1 rounded">
-                SOLUÇÃO: {item.fix}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* FINAL DIAGRAM */}
       <div className="mt-16">
         <h3 className="mb-6 text-xl font-bold flex items-center gap-2">

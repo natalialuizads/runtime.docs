@@ -16,6 +16,7 @@ import {
   RefreshCw,
   ServerCrash,
   ShieldAlert,
+  ShieldCheck,
   XCircle,
   Zap,
 } from "lucide-react";
@@ -109,7 +110,8 @@ function ListRenderingDemo() {
                   status === "frozen" && "paused opacity-50 text-destructive",
                 )}
                 style={{
-                  animationPlayState: status === "frozen" ? "paused" : "running",
+                  animationPlayState:
+                    status === "frozen" ? "paused" : "running",
                 }}
               />
             </div>
@@ -469,172 +471,276 @@ function RaceConditionDemo() {
   );
 }
 
+
 // ==========================================
-// DEMO 4: VALIDATION (CLIENT VS SERVER)
+// DEMO 5: THE BOSS FIGHT (CHAOS MODE)
 // ==========================================
-function ValidationDemo() {
-  const [formData, setFormData] = useState({ email: "", age: "" });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [mode, setMode] = useState<"backend" | "client">("backend");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+function RealWorldChaosDemo() {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<{ id: number; name: string }[]>([]);
+  const [details, setDetails] = useState<Record<number, string>>({});
+  const [isChaosMode, setIsChaosMode] = useState(true);
+  const [logs, setLogs] = useState<string[]>([]);
+  const [pendingRequests, setPendingRequests] = useState(0);
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    setErrors({});
-    await new Promise((r) => setTimeout(r, 600)); // Latency
+  const addLog = (msg: string) => setLogs((prev) => [msg, ...prev].slice(0, 6));
 
-    const newErrors: Record<string, string> = {};
-    if (!formData.email.includes("@"))
-      newErrors.email = "Email inválido (Server)";
-    if (Number(formData.age) < 18) newErrors.age = "Menor de idade (Server)";
+  // --- MODO CAOS (O JEITO ERRADO) ---
+  const handleChaosChange = async (val: string) => {
+    setQuery(val);
 
-    setErrors(newErrors);
-    setIsSubmitting(false);
+    // 1. SEM DEBOUNCE (Dispara a cada tecla)
+    addLog(`⚡ Input: "${val}" (No Debounce)`);
+    setPendingRequests((p) => p + 1);
+
+    // 2. RACE CONDITION SIMULATOR
+    // Random delay: request antigo pode chegar depois do novo
+    const delay = Math.random() * 1000 + 500;
+    await new Promise((r) => setTimeout(r, delay));
+
+    // 3. CORREÇÃO DE KEYS (ID ÚNICO)
+    // Antes usávamos i + Math.random(), o que podia gerar colisão.
+    // Agora geramos uma base aleatória FORA do loop.
+    const baseId = Math.floor(Math.random() * 1000000);
+    const newResults = Array.from({ length: 50 }).map((_, i) => ({
+      id: baseId + i,
+      name: `${val} Item ${i}`,
+    }));
+
+    setResults(newResults);
+    setPendingRequests((p) => p - 1);
+    addLog(`✅ Render: Lista atualizada para "${val}"`);
+
+    // 4. O PROBLEMA N+1
+    newResults.forEach(async (item) => {
+      await new Promise((r) => setTimeout(r, Math.random() * 2000));
+      setDetails((prev) => ({
+        ...prev,
+        [item.id]: "Detalhe carregado via N+1",
+      }));
+    });
   };
 
-  const handleChange = (field: string, value: string) => {
-    const newData = { ...formData, [field]: value };
-    setFormData(newData);
+  // --- MODO ENGENHEIRO (O JEITO CERTO) ---
+  const handleCleanChange = (val: string) => {
+    setQuery(val);
+    // Simula Debounce visualmente
+    if (pendingRequests > 0) return;
 
-    if (mode === "client") {
-      const newErrors = { ...errors };
-      if (field === "email") {
-        newErrors.email = value.includes("@") ? "" : "Email deve ter @";
+    setPendingRequests(1);
+    addLog(`🛡️ Debounce: Aguardando usuário parar...`);
+
+    setTimeout(async () => {
+      addLog(`🚀 Fetch Único: Buscando "${val}" + Detalhes`);
+      await new Promise((r) => setTimeout(r, 600));
+
+      const newResults = Array.from({ length: 50 }).map((_, i) => ({
+        id: i,
+        name: `${val} Item ${i}`,
+      }));
+      setResults(newResults);
+      // Batch update dos detalhes
+      const newDetails: Record<number, string> = {};
+      newResults.forEach((r) => (newDetails[r.id] = "Detalhe (Batch)"));
+      setDetails(newDetails);
+      setPendingRequests(0);
+    }, 800);
+  };
+
+  // 5. CUSTO DE CPU (Heavy Render)
+  // Simula um componente pesado renderizando 50x
+  const HeavyItem = ({ text }: { text: string }) => {
+    if (isChaosMode) {
+      const start = performance.now();
+      while (performance.now() - start < 2) {
+        // Bloqueia a thread por 2ms por item (Total ~100ms lag na digitação)
+        Math.sqrt(Math.random());
       }
-      if (field === "age") {
-        newErrors.age = Number(value) >= 18 ? "" : "Deve ser 18+";
-      }
-      setErrors(newErrors);
     }
+    return <div className="p-2 border-b text-xs">{text}</div>;
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card p-6 shadow-sm mt-8">
-      <div className="mb-6 border-b border-border pb-4 flex justify-between items-center">
+    <div className="rounded-xl border-2 border-destructive/50 bg-card p-6 shadow-2xl relative overflow-hidden mt-16">
+      {/* Background Warning Effect */}
+      {isChaosMode && (
+        <div className="absolute top-0 left-0 w-full h-1 bg-destructive animate-pulse" />
+      )}
+
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h4 className="flex items-center gap-2 text-lg font-bold text-foreground">
-            <ShieldAlert className="h-5 w-5 text-blue-500" />
-            Cenário 4: Onde Validar?
+          <h4 className="flex items-center gap-2 text-2xl font-bold text-foreground">
+            <Zap
+              className={cn(
+                "h-6 w-6",
+                isChaosMode ? "text-destructive" : "text-green-500",
+              )}
+            />
+            O "Boss Fight": Mundo Real
           </h4>
-          <p className="text-sm text-muted-foreground mt-1">
-            Validação Server-Side (padrão) vs Validação Client-Side (UX).
+          <p className="text-sm text-muted-foreground mt-1 max-w-xl">
+            Tente digitar rápido no input abaixo. No "Modo Caos", combinamos
+            <strong>
+              {" "}
+              Lista Pesada + Requests em Cascata + Race Conditions
+            </strong>
+            .
           </p>
         </div>
 
-        <div className="flex bg-muted rounded-lg p-1">
+        <div className="flex items-center gap-3 bg-muted p-1 rounded-lg">
           <button
             onClick={() => {
-              setMode("backend");
-              setErrors({});
+              setIsChaosMode(true);
+              setResults([]);
+              setLogs([]);
             }}
             className={cn(
-              "px-3 py-1 text-xs font-bold rounded-md transition-all",
-              mode === "backend"
-                ? "bg-background shadow text-foreground"
-                : "text-muted-foreground",
+              "px-4 py-2 text-sm font-bold rounded-md transition-all flex items-center gap-2",
+              isChaosMode
+                ? "bg-destructive text-destructive-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
-            Submit-Only
+            <ServerCrash className="h-4 w-4" />
+            Modo Caos
           </button>
           <button
             onClick={() => {
-              setMode("client");
-              setErrors({});
+              setIsChaosMode(false);
+              setResults([]);
+              setLogs([]);
             }}
             className={cn(
-              "px-3 py-1 text-xs font-bold rounded-md transition-all",
-              mode === "client"
-                ? "bg-background shadow text-foreground"
-                : "text-muted-foreground",
+              "px-4 py-2 text-sm font-bold rounded-md transition-all flex items-center gap-2",
+              !isChaosMode
+                ? "bg-green-600 text-white shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
-            Real-time
+            <ShieldCheck className="h-4 w-4" />
+            Modo Engenheiro
           </button>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-12">
-        <div className="space-y-4">
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* COLUNA 1: INTERAÇÃO */}
+        <div className="space-y-6 lg:col-span-1">
           <div className="space-y-2">
-            <label className="text-xs font-bold text-muted-foreground">
-              Email
-            </label>
-            <div className="relative">
-              <input
-                value={formData.email}
-                onChange={(e) => handleChange("email", e.target.value)}
-                className={cn(
-                  "w-full bg-background border rounded-md px-3 py-2 text-sm outline-none transition-all",
-                  errors.email
-                    ? "border-destructive ring-1 ring-destructive"
-                    : "border-input focus:ring-2 focus:ring-primary",
-                )}
-              />
-              {errors.email && (
-                <div className="absolute right-3 top-2.5 text-destructive">
-                  <XCircle className="h-4 w-4" />
-                </div>
+            <label className="text-xs font-bold uppercase text-muted-foreground flex justify-between">
+              <span>Busca Global</span>
+              {pendingRequests > 0 && (
+                <span className="text-orange-500 animate-pulse">
+                  Processing...
+                </span>
               )}
-            </div>
-            {errors.email && (
-              <p className="text-xs text-destructive font-bold">
-                {errors.email}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-muted-foreground">
-              Idade
             </label>
-            <div className="relative">
-              <input
-                value={formData.age}
-                type="number"
-                onChange={(e) => handleChange("age", e.target.value)}
-                className={cn(
-                  "w-full bg-background border rounded-md px-3 py-2 text-sm outline-none transition-all",
-                  errors.age
-                    ? "border-destructive ring-1 ring-destructive"
-                    : "border-input focus:ring-2 focus:ring-primary",
-                )}
-              />
-            </div>
-            {errors.age && (
-              <p className="text-xs text-destructive font-bold">{errors.age}</p>
-            )}
+            <input
+              value={query}
+              onChange={(e) =>
+                isChaosMode
+                  ? handleChaosChange(e.target.value)
+                  : handleCleanChange(e.target.value)
+              }
+              placeholder="Digite rápido..."
+              className={cn(
+                "w-full text-lg px-4 py-3 bg-background border rounded-lg outline-none transition-all",
+                isChaosMode
+                  ? "border-destructive/50 focus:ring-4 focus:ring-destructive/20"
+                  : "border-green-500/50 focus:ring-4 focus:ring-green-500/20",
+              )}
+            />
+            <p className="text-[10px] text-muted-foreground">
+              {isChaosMode
+                ? "⚠️ Input causa travamento de UI (Main Thread Block)"
+                : "✅ Input fluido (Debounce + Render Otimizado)"}
+            </p>
           </div>
 
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="w-full bg-primary text-primary-foreground font-bold py-2 rounded-md hover:bg-primary/90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-          >
-            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-            Enviar Dados
-          </button>
+          <div className="bg-black/90 rounded-lg p-4 font-mono text-[10px] h-[200px] overflow-hidden flex flex-col">
+            <div className="text-muted-foreground border-b border-white/10 pb-2 mb-2 flex justify-between">
+              <span>CONSOLE LOGS</span>
+              <span
+                className={cn(
+                  "font-bold",
+                  pendingRequests > 5 ? "text-red-500" : "text-green-500",
+                )}
+              >
+                REQ: {pendingRequests}
+              </span>
+            </div>
+            <div className="space-y-1 overflow-y-auto">
+              {logs.map((log, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    "truncate",
+                    log.includes("Input")
+                      ? "text-yellow-400"
+                      : "text-green-400",
+                  )}
+                >
+                  {log}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center justify-center bg-muted/20 rounded-xl border border-border border-dashed p-6">
-          {mode === "backend" ? (
-            <div className="text-center space-y-2">
-              <FormInput className="h-10 w-10 text-muted-foreground mx-auto" />
-              <h5 className="font-bold text-sm">Experiência "Old School"</h5>
-              <p className="text-xs text-muted-foreground max-w-[200px] mx-auto">
-                O usuário preenche tudo às cegas. Só descobre o erro após o
-                loading do servidor.
-              </p>
-            </div>
-          ) : (
-            <div className="text-center space-y-2">
-              <Activity className="h-10 w-10 text-accent mx-auto" />
-              <h5 className="font-bold text-sm">Experiência Moderna</h5>
-              <p className="text-xs text-muted-foreground max-w-[200px] mx-auto">
-                Feedback instantâneo (Optimistic UI). O servidor serve apenas
-                como "double check" de segurança.
-              </p>
-            </div>
-          )}
+        {/* COLUNA 2 e 3: VISUALIZAÇÃO DO CAOS */}
+        <div className="lg:col-span-2 bg-muted/20 rounded-xl border border-border p-4 h-[400px] flex flex-col relative">
+          <div className="flex justify-between items-center mb-4 border-b border-border pb-2">
+            <span className="text-xs font-bold text-muted-foreground uppercase">
+              Resultados da Busca
+            </span>
+            <span className="text-xs font-mono">
+              {results.length} itens {isChaosMode && "(Render Pesado)"}
+            </span>
+          </div>
+
+          <div className="flex-1 overflow-y-auto space-y-2 pr-2 relative">
+            {/* SIMULAÇÃO DE EFEITO VISUAL DE CARREGAMENTO RUIM */}
+            {isChaosMode && pendingRequests > 2 && (
+              <div className="absolute inset-0 bg-background/50 z-10 flex items-center justify-center backdrop-blur-[1px]">
+                <div className="bg-destructive text-destructive-foreground px-4 py-2 rounded font-bold animate-bounce">
+                  UI LAG DETECTADO
+                </div>
+              </div>
+            )}
+
+            {results.length === 0 && (
+              <div className="h-full flex flex-col items-center justify-center text-muted-foreground opacity-50">
+                <Layers className="h-12 w-12 mb-2" />
+                <p>Aguardando input...</p>
+              </div>
+            )}
+
+            {results.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between bg-card p-3 rounded border border-border/50 animate-in fade-in slide-in-from-bottom-2 duration-300"
+              >
+                <div className="flex flex-col">
+                  <span className="font-bold text-sm text-foreground">
+                    {item.name}
+                  </span>
+                  <HeavyItem
+                    text={
+                      details[item.id] ||
+                      (isChaosMode ? "⏳ Buscando detalhe..." : "...")
+                    }
+                  />
+                </div>
+                {isChaosMode && !details[item.id] && (
+                  <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                )}
+                {!isChaosMode && (
+                  <CheckCircle2 className="h-3 w-3 text-green-500" />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -658,18 +764,22 @@ export function ChallengeOneSection() {
         <h2 className="mb-4 text-3xl font-bold text-foreground">
           Laboratório de Performance & Estado
         </h2>
-        
+
         {/* === MENSAGEM CHAVE ADICIONADA AQUI === */}
         <div className="bg-muted/30 border border-border rounded-lg p-6 mb-6">
           <p className="text-lg text-foreground font-medium mb-2">
             Desafios Isolados vs. Realidade
           </p>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Nesta seção, vamos dissecar cada problema (CPU, Rede, Estado) separadamente para fins didáticos. 
-            <br/><br/>
-            <strong>Porém, cuidado:</strong> No mundo real, uma única tela (como um Dashboard de Vendas ou um Formulário de Checkout) 
-            frequentemente enfrenta <strong>todos esses problemas simultaneamente</strong>. 
-            O engenheiro Frontend precisa malabarizar renderização de listas, requests em paralelo e validação de input tudo ao mesmo tempo.
+            Nesta seção, vamos dissecar cada problema (CPU, Rede, Estado)
+            separadamente para fins didáticos.
+            <br />
+            <br />
+            <strong>Porém, cuidado:</strong> No mundo real, uma única tela (como
+            um Dashboard de Vendas ou um Formulário de Checkout) frequentemente
+            enfrenta <strong>todos esses problemas simultaneamente</strong>. O
+            engenheiro Frontend precisa malabarizar renderização de listas,
+            requests em paralelo e validação de input tudo ao mesmo tempo.
           </p>
         </div>
       </div>
@@ -678,7 +788,7 @@ export function ChallengeOneSection() {
         {/* === PARTE 1: CPU / DOM === */}
         <div>
           <ListRenderingDemo />
-          
+
           <div className="mt-6 grid md:grid-cols-2 gap-4">
             <div className="rounded-lg border border-border bg-card p-5">
               <h5 className="font-bold flex items-center gap-2 mb-2 text-sm text-foreground">
@@ -719,7 +829,7 @@ export function ChallengeOneSection() {
         {/* === PARTE 2: N+1 / NETWORK === */}
         <div>
           <NPlusOneDemo />
-          
+
           <div className="mt-6 grid md:grid-cols-2 gap-4">
             <div className="rounded-lg border border-border bg-card p-5">
               <h5 className="font-bold flex items-center gap-2 mb-2 text-sm text-foreground">
@@ -749,7 +859,7 @@ export function ChallengeOneSection() {
         {/* === PARTE 3: RACE CONDITIONS === */}
         <div>
           <RaceConditionDemo />
-          
+
           <div className="mt-6 grid md:grid-cols-2 gap-4">
             <div className="rounded-lg border border-border bg-card p-5">
               <h5 className="font-bold flex items-center gap-2 mb-2 text-sm text-foreground">
@@ -779,48 +889,24 @@ export function ChallengeOneSection() {
           </div>
         </div>
 
-        <div className="w-full border-t border-dashed border-border"></div>
+        {/* SEPARADOR DRAMÁTICO */}
+        <div className="py-12 flex items-center justify-center">
+          <div className="h-px w-full max-w-[200px] bg-gradient-to-r from-transparent via-border to-transparent" />
+          <span className="mx-4 text-xs font-mono text-muted-foreground uppercase tracking-widest">
+            Conclusão Prática
+          </span>
+          <div className="h-px w-full max-w-[200px] bg-gradient-to-r from-transparent via-border to-transparent" />
+        </div>
 
-        {/* === PARTE 4: VALIDATION === */}
-        <div>
-          <ValidationDemo />
+        <RealWorldChaosDemo />
 
-          <div className="mt-6 grid md:grid-cols-2 gap-4">
-            <div className="rounded-lg border border-border bg-card p-5">
-              <h5 className="font-bold flex items-center gap-2 mb-2 text-sm text-foreground">
-                <Database className="h-4 w-4 text-muted-foreground" />
-                Mentalidade Backend
-              </h5>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                "Nunca confie no cliente". Verdade para segurança, mas ruim para
-                UX. Validar só no submit cria frustração.
-              </p>
-            </div>
-            <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-5">
-              <h5 className="font-bold flex items-center gap-2 mb-2 text-sm text-blue-600">
-                <CheckCircle2 className="h-4 w-4" />
-                Validação no Cliente (UX)
-              </h5>
-              <p className="text-sm text-foreground/80 leading-relaxed mb-2">
-                Antecipe o feedback:
-              </p>
-              <ul className="space-y-1 text-sm text-foreground/80">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-500 font-bold">•</span>
-                  <span>
-                    <strong>UX:</strong> Avise o erro enquanto o usuário digita.
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-500 font-bold">•</span>
-                  <span>
-                    <strong>Security:</strong> Valide novamente ao receber
-                    (server).
-                  </span>
-                </li>
-              </ul>
-            </div>
-          </div>
+        <div className="mt-8 text-center max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-sm">
+            Isso é o que separa um código que "funciona" de um código que
+            escala. No Frontend, a complexidade não está em um algoritmo
+            isolado, mas na <strong>orquestração</strong> de CPU, Rede e
+            Experiência do Usuário simultaneamente.
+          </p>
         </div>
       </div>
     </section>

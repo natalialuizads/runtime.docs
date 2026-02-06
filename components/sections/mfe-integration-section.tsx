@@ -72,8 +72,7 @@ export function MFEIntegrationSection() {
               2. Web Components (O Container)
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Usa o <strong>Shadow DOM</strong> para criar uma cápsula. O JS compartilha o "kernel" (browser), mas o CSS é isolado.
-              <strong> Para o Backend:</strong> É como rodar via Docker. Os processos compartilham a CPU/RAM, mas têm namespaces isolados.
+              É a padronização nativa, 'bare metal' no Browser. Assim como um container Docker roda igual em Ubuntu ou Alpine, um Web Component roda igual dentro de React, Angular ou HTML puro. O Shadow DOM cria uma barreira de proteção de estilos, permitindo que times diferentes entreguem funcionalidades complexas sem o risco de 'quebrar o layout' da aplicação hospedeira."
             </p>
             <div className="flex gap-2">
                <span className="px-2 py-1 rounded bg-blue-500/10 text-blue-500 text-[10px] font-bold">BROWSER NATIVO</span>

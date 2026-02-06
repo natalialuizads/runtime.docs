@@ -43,10 +43,10 @@ export function MFEPatternsSection() {
           </span>
         </div>
         <h2 className="text-4xl font-extrabold text-foreground tracking-tight sm:text-5xl">
-          Padrões de Arquitetura
+         Como fatiar o monólito?
         </h2>
         <p className="mt-6 text-xl text-muted-foreground leading-relaxed max-w-3xl">
-          Como fatiar o monolito? A decisão entre divisão Vertical e Horizontal
+          A decisão entre divisão Vertical e Horizontal
           define não apenas o código, mas a estrutura organizacional da empresa
           (Lei de Conway).
         </p>

@@ -264,82 +264,81 @@ export function ArchitectureSpectrumSection() {
         })}
       </div>
 
-      {/* Painel Principal */}
-      <div className="grid lg:grid-cols-3 gap-8">
-        
-        {/* Coluna da Esquerda: Detalhes e Métricas */}
-        <div className="lg:col-span-1 space-y-6">
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm h-full">
-                <h3 className="text-2xl font-bold text-foreground mb-1">
-                    {current.name.split('(')[0]}
-                </h3>
-                <p className="text-sm font-medium text-muted-foreground mb-4">
-                    {current.name.split('(')[1]?.replace(')', '')}
-                </p>
-
-                <div className="bg-muted/50 rounded-lg p-3 mb-6 border border-border/50">
-                    <span className="text-xs font-mono uppercase text-muted-foreground block mb-1">Analogia para Backend</span>
+      {/* PARTE 1: EXPLICAÇÃO E MÉTRICAS (TOPO) */}
+      <div className="mb-8 rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="grid md:grid-cols-3 gap-8">
+            {/* Esquerda: Texto */}
+            <div className="md:col-span-2 space-y-4">
+                <div>
+                    <h3 className="text-2xl font-bold text-foreground">
+                        {current.name.split('(')[0]}
+                    </h3>
+                    <p className="text-sm font-medium text-muted-foreground">
+                        {current.name.split('(')[1]?.replace(')', '')}
+                    </p>
+                </div>
+                
+                <div className="bg-muted/50 rounded-lg p-3 inline-flex border border-border/50">
                     <span className={`text-sm font-bold text-${current.color} flex items-center gap-2`}>
-                        <Server className="h-3 w-3" />
-                        {current.backendAnalogy}
+                        <Server className="h-4 w-4" />
+                        Analogia Backend: {current.backendAnalogy}
                     </span>
                 </div>
 
-                <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+                <p className="text-base text-muted-foreground leading-relaxed">
                     {current.description}
                 </p>
-                
-                <div className="space-y-4">
-                    <MetricBar label="Custo Servidor" value={current.metrics.serverLoad} color="destructive" tooltip="CPU/Memória consumida por request" />
-                    <MetricBar label="SEO" value={current.metrics.seo} color="blue-500" tooltip="Facilidade de indexação pelo Google" />
-                    <MetricBar label="Performance (TTFB)" value={current.metrics.latency} color="green-500" tooltip="Tempo até o primeiro byte" />
-                </div>
             </div>
-        </div>
 
-        {/* Coluna da Direita: Diagrama Interativo */}
-        <div className="lg:col-span-2">
-            <div className="rounded-xl border border-border bg-card shadow-sm h-full flex flex-col overflow-hidden">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/20">
-                    <div className="flex items-center gap-2">
-                        <Activity className="h-4 w-4 text-primary" />
-                        <span className="font-bold text-sm">Fluxo de Requisição</span>
-                    </div>
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded bg-${current.color}/10 text-${current.color}`}>
-                        {current.id.toUpperCase()}
-                    </span>
-                </div>
-
-                <div className="p-6 flex-1 bg-background/50 min-h-[400px] flex flex-col justify-center">
-                     <div className="animate-in fade-in zoom-in-95 duration-300">
-                         <DynamicDiagram
-                            title={`Processo: ${current.name}`}
-                            nodes={current.diagram.nodes}
-                            edges={current.diagram.edges}
-                        />
-                        <div className="mt-8 flex justify-center gap-6 text-xs text-muted-foreground border-t border-border/50 pt-4">
-                            <div className="flex items-center gap-1.5">
-                                <div className="w-2 h-2 rounded-full bg-border" /> Request
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" /> Processamento Principal
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {/* Direita: Métricas */}
+            <div className="md:col-span-1 border-t md:border-t-0 md:border-l border-border pt-6 md:pt-0 md:pl-6 space-y-5 flex flex-col justify-center">
+                <MetricBar label="Custo Servidor" value={current.metrics.serverLoad} color="destructive" tooltip="CPU/Memória consumida por request" />
+                <MetricBar label="SEO Power" value={current.metrics.seo} color="blue-500" tooltip="Facilidade de indexação pelo Google" />
+                <MetricBar label="Performance (TTFB)" value={current.metrics.latency} color="green-500" tooltip="Tempo até o primeiro byte" />
             </div>
         </div>
       </div>
 
+      {/* PARTE 2: FLUXO DE REQUISIÇÃO (DIAGRAMA) */}
+      <div className="rounded-xl border border-border bg-card shadow-sm h-full flex flex-col overflow-hidden mb-8">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/20">
+                <div className="flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-primary" />
+                    <span className="font-bold text-sm">Visualização do Fluxo</span>
+                </div>
+                <span className={`text-xs font-mono px-2 py-0.5 rounded bg-${current.color}/10 text-${current.color}`}>
+                    {current.id.toUpperCase()} PROTOCOL
+                </span>
+            </div>
+
+            <div className="p-0 bg-background/50 h-[500px] w-full relative">
+                 <div className="absolute inset-0 animate-in fade-in zoom-in-95 duration-500">
+                     <DynamicDiagram
+                        title={`Arquitetura: ${current.name}`}
+                        nodes={current.diagram.nodes}
+                        edges={current.diagram.edges}
+                    />
+                </div>
+            </div>
+             <div className="bg-card border-t border-border p-3 flex justify-center gap-6 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-border" /> Request Simples
+                </div>
+                <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" /> Processamento Pesado
+                </div>
+            </div>
+      </div>
+
       {/* Seção de Análise (Trade-offs e Alertas) */}
-      <div className="mt-8 grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-3 gap-6">
          {/* Pros */}
          <div className="space-y-3">
              <h4 className="text-xs font-mono font-bold text-muted-foreground uppercase flex items-center gap-2">
                  <CheckCircle2 className="h-4 w-4 text-green-500" />
-                 Por que escolher (Pros)
+                 Ganhos (Pros)
              </h4>
-             <ul className="grid gap-2 h-full">
+             <ul className="grid gap-2">
                  {current.prosBackend.map((pro, i) => (
                      <li key={i} className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card/50 text-sm">
                          <span className="text-green-500 font-bold mt-0.5">+</span>
@@ -353,9 +352,9 @@ export function ArchitectureSpectrumSection() {
          <div className="space-y-3">
              <h4 className="text-xs font-mono font-bold text-muted-foreground uppercase flex items-center gap-2">
                  <XCircle className="h-4 w-4 text-destructive" />
-                 Onde dói (Cons)
+                 Dores (Cons)
              </h4>
-             <ul className="grid gap-2 h-full">
+             <ul className="grid gap-2">
                  {current.consBackend.map((con, i) => (
                      <li key={i} className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card/50 text-sm">
                          <span className="text-destructive font-bold mt-0.5">-</span>
@@ -396,7 +395,7 @@ function MetricBar({
   tooltip: string;
 }) {
   return (
-    <div className="group relative">
+    <div className="group relative" title={tooltip}>
       <div className="mb-1.5 flex justify-between items-end">
         <span className="text-xs font-medium text-muted-foreground">{label}</span>
         <span className="text-xs font-mono font-bold text-foreground">{value}%</span>
