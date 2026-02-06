@@ -24,6 +24,10 @@ function EventLoopExplorer() {
   const [fps, setFps] = useState(60);
   const [isBlocked, setIsBlocked] = useState(false);
 
+  // CONSTANTE DE VELOCIDADE (MS)
+  // Aumentei para 1.5s para ficar mais fácil de acompanhar
+  const TICK_RATE = 1500; 
+
   // Simula o Heartbeat (FPS Counter)
   useEffect(() => {
     let lastTime = performance.now();
@@ -67,7 +71,7 @@ function EventLoopExplorer() {
           return newQueue;
         });
       }
-    }, 800); // Velocidade do "Slow Motion" para didática
+    }, TICK_RATE);
 
     return () => clearInterval(interval);
   }, [isLooping, stack.length, queue.length]);
@@ -91,19 +95,19 @@ function EventLoopExplorer() {
     setTimeout(() => {
         // Remove da Stack (já executou a linha do setTimeout)
         setStack((prev) => prev.filter(i => i !== "setTimeout(cb, 0)"));
-        setWebApi(["Timer (0ms)"]);
+        setWebApi(["Timer (Running...)"]);
 
         // 3. Move da Web API para Queue
         setTimeout(() => {
             setWebApi([]);
             setQueue((prev) => [...prev, "callback()"]);
             
-            // Remove o main() eventualmente
+            // Remove o main() eventualmente para limpar a stack
              setTimeout(() => {
                 setStack((prev) => prev.filter(i => i !== "main()"));
-            }, 800);
-        }, 800);
-    }, 800);
+            }, TICK_RATE);
+        }, TICK_RATE);
+    }, TICK_RATE);
   };
 
   return (
@@ -139,9 +143,9 @@ function EventLoopExplorer() {
                 <h5 className="font-bold flex items-center gap-2 text-sm"><Layers className="h-4 w-4" /> Call Stack (Pilha)</h5>
                 <span className="text-[10px] bg-secondary px-2 py-0.5 rounded text-muted-foreground">Executa Agora</span>
             </div>
-            <div className="h-48 border-2 border-primary/20 bg-background/50 rounded-lg flex flex-col-reverse p-2 gap-2 relative overflow-hidden">
+            <div className="h-48 border-2 border-primary/20 bg-background/50 rounded-lg flex flex-col-reverse p-2 gap-2 relative overflow-hidden transition-all">
                 {stack.map((item, i) => (
-                    <div key={i} className="bg-primary/20 border border-primary text-primary px-3 py-2 rounded text-xs font-mono font-bold animate-in slide-in-from-top-2">
+                    <div key={i} className="bg-primary/20 border border-primary text-primary px-3 py-2 rounded text-xs font-mono font-bold animate-in slide-in-from-top-2 duration-500">
                         {item}
                     </div>
                 ))}
@@ -164,7 +168,7 @@ function EventLoopExplorer() {
                     <h5 className="font-bold flex items-center gap-2 text-sm"><Layout className="h-4 w-4" /> Web APIs</h5>
                     <span className="text-[10px] bg-secondary px-2 py-0.5 rounded text-muted-foreground">Browser/C++</span>
                 </div>
-                <div className="h-16 border-2 border-dashed border-accent/30 bg-accent/5 rounded-lg flex items-center justify-center gap-2">
+                <div className="h-16 border-2 border-dashed border-accent/30 bg-accent/5 rounded-lg flex items-center justify-center gap-2 transition-all">
                      {webApi.map((item, i) => (
                         <div key={i} className="bg-accent text-accent-foreground px-2 py-1 rounded text-xs font-mono animate-pulse">
                             {item}
@@ -175,7 +179,7 @@ function EventLoopExplorer() {
             </div>
 
             <div className="flex justify-center">
-                <ArrowDown className="h-6 w-6 text-muted-foreground animate-bounce" />
+                <ArrowDown className="h-6 w-6 text-muted-foreground animate-bounce duration-1000" />
             </div>
 
             {/* Task Queue */}
@@ -184,9 +188,9 @@ function EventLoopExplorer() {
                     <h5 className="font-bold flex items-center gap-2 text-sm"><Clock className="h-4 w-4" /> Task Queue (Fila)</h5>
                     <span className="text-[10px] bg-secondary px-2 py-0.5 rounded text-muted-foreground">Espera sua vez</span>
                 </div>
-                <div className="h-16 border-2 border-secondary bg-secondary/20 rounded-lg flex items-center px-2 gap-2 overflow-x-auto">
+                <div className="h-16 border-2 border-secondary bg-secondary/20 rounded-lg flex items-center px-2 gap-2 overflow-x-auto transition-all">
                     {queue.map((item, i) => (
-                        <div key={i} className="bg-secondary-foreground text-secondary px-2 py-1 rounded text-xs font-mono whitespace-nowrap">
+                        <div key={i} className="bg-secondary-foreground text-secondary px-2 py-1 rounded text-xs font-mono whitespace-nowrap animate-in zoom-in duration-300">
                             {item}
                         </div>
                     ))}
