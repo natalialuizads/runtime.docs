@@ -27,6 +27,7 @@ interface Edge {
   to: string;
   label?: string;
   animated?: boolean;
+  color?: string;
 }
 
 interface DynamicDiagramProps {
@@ -65,6 +66,7 @@ export function DynamicDiagram({
     label: edge.label || "",
     style: {
       strokeWidth: 2,
+      stroke: edge.color,
     },
   }));
 
