@@ -184,10 +184,7 @@ export default function BrowserRuntimeDocs() {
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
-      <Navigation
-        activeSection={activeSection}
-        onSectionChange={handleSectionChange}
-      />
+   
 
       <main>
         <div ref={sectionRefs.intro}>
