@@ -1,6 +1,7 @@
 "use client";
 
 import { PresentationMode } from "@/components/presentation-mode";
+import { AlternativesSection } from "@/components/sections/alternative-section";
 import { ArchitectureSpectrumSection } from "@/components/sections/architecture-spectrum-section";
 import { AuthSection } from "@/components/sections/auth-section";
 import { BundleSection } from "@/components/sections/bundle-section";
@@ -15,7 +16,6 @@ import { MFEIntegrationSection } from "@/components/sections/mfe-integration-sec
 import { MFEIntroSection } from "@/components/sections/mfe-intro-section";
 import { MFEPatternsSection } from "@/components/sections/mfe-patterns-section";
 import { ModuleFederationSection } from "@/components/sections/module-federation-section";
-import { Navigation } from "@/components/sections/navigation";
 import { useEffect, useRef, useState } from "react";
 
 export default function BrowserRuntimeDocs() {
@@ -39,6 +39,7 @@ export default function BrowserRuntimeDocs() {
     "mfe-intro": useRef<HTMLDivElement>(null),
     "module-federation": useRef<HTMLDivElement>(null),
     "challenge-2": useRef<HTMLDivElement>(null),
+    alternative: useRef<HTMLDivElement>(null),
   };
 
   const slides = [
@@ -114,6 +115,11 @@ export default function BrowserRuntimeDocs() {
       title: "Vazamento de Estilo e Observabilidade",
       content: <ChallengeTwoSection />,
     },
+    {
+      id: "alternative",
+      title: "Alternativas",
+      content: <AlternativesSection />,
+    },
   ];
 
   const handleSectionChange = (section: string) => {
@@ -184,8 +190,6 @@ export default function BrowserRuntimeDocs() {
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
-   
-
       <main>
         <div ref={sectionRefs.intro}>
           <HeroSection onStart={handleStart} />
@@ -277,6 +281,13 @@ export default function BrowserRuntimeDocs() {
             ref={sectionRefs["challenge-2"]}
           >
             <ChallengeTwoSection />
+          </div>
+
+          <div
+            className="border-t border-border/50"
+            ref={sectionRefs.alternative}
+          >
+            <AlternativesSection />
           </div>
         </div>
 
